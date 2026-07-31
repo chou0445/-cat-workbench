@@ -7,7 +7,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#D4977A">
   <meta name="apple-mobile-web-app-title" content="猫咪工作台">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="猫咪工作台">
+  <meta name="format-detection" content="telephone=no">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>猫咪工作台</title>
   <link rel="stylesheet" href="css/style.css">
@@ -49,8 +53,14 @@
         </div>
         <span class="tab-label">猫圈</span>
       </div>
-    </nav>
+  </nav>
+
+  <!-- PWA 安装按钮 -->
+  <div id="pwa-install-btn" style="display:none;position:fixed;bottom:80px;right:16px;z-index:100;background:#D4977A;color:#fff;border-radius:40px;padding:12px 20px;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(212,151,122,0.4);cursor:pointer;align-items:center;gap:8px;" onclick="pwaInstall()">
+    <span style="font-size:18px;">📱</span>
+    <span>安装App</span>
   </div>
+</div>
 
   <script>
     window.__jsErrors = [];
@@ -70,6 +80,32 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function() {});
     }
+
+    // PWA 安装引导
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      // 显示安装按钮
+      var btn = document.getElementById('pwa-install-btn');
+      if (btn) btn.style.display = 'flex';
+    });
+
+    function pwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function() {
+          deferredPrompt = null;
+          var btn = document.getElementById('pwa-install-btn');
+          if (btn) btn.style.display = 'none';
+        });
+      }
+    }
+
+    window.addEventListener('appinstalled', function() {
+      var btn = document.getElementById('pwa-install-btn');
+      if (btn) btn.style.display = 'none';
+    });
   </script>
 </body>
 </html>

@@ -2,22 +2,40 @@
   "name": "猫咪健康工作台",
   "short_name": "猫咪工作台",
   "description": "猫咪饮食、健康、活力一站式管理",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#F8F6F5",
   "theme_color": "#D4977A",
   "orientation": "portrait-primary",
+  "categories": ["lifestyle", "health"],
+  "lang": "zh-CN",
+  "dir": "ltr",
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
