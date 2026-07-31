@@ -53,14 +53,14 @@
         </div>
         <span class="tab-label">猫圈</span>
       </div>
-  </nav>
+    </nav>
 
-  <!-- PWA 安装按钮 -->
-  <div id="pwa-install-btn" style="display:none;position:fixed;bottom:80px;right:16px;z-index:100;background:#D4977A;color:#fff;border-radius:40px;padding:12px 20px;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(212,151,122,0.4);cursor:pointer;align-items:center;gap:8px;" onclick="pwaInstall()">
-    <span style="font-size:18px;">📱</span>
-    <span>安装App</span>
+    <!-- PWA 安装按钮 -->
+    <div id="pwa-install-btn" style="display:none;position:fixed;bottom:80px;right:16px;z-index:100;background:#D4977A;color:#fff;border-radius:40px;padding:12px 20px;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(212,151,122,0.4);cursor:pointer;align-items:center;gap:8px;" onclick="pwaInstall()">
+      <span style="font-size:18px;">📱</span>
+      <span>安装App</span>
+    </div>
   </div>
-</div>
 
   <script>
     window.__jsErrors = [];
@@ -78,7 +78,9 @@
   <script>
     // 注册 Service Worker (PWA)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(function() {});
+      navigator.serviceWorker.register('sw.js', {scope: './'}).catch(function(e) {
+        console.warn('SW register failed:', e);
+      });
     }
 
     // PWA 安装引导
