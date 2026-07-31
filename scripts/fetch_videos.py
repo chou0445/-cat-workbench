@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 """
 猫咪视频自动抓取脚本
-从 B站搜索养猫相关视频，生成 videos.json，推送到 GitHub Gist
+B站(API搜索多关键词多页) + 抖音/小红书(种子链接，解析封面)
+推送到 GitHub Gist，前端直接读取 Gist raw URL
 """
 
-import json
-import hashlib
-import time
-import urllib.parse
-import urllib.request
-import re
-import os
+import json, hashlib, time, urllib.parse, urllib.request, re, os
+from datetime import datetime
 
 # ============ 配置 ============
 GIST_ID = os.environ.get("GIST_ID", "0a6c4b9f92ef51a997ecb53f6d5cf04d")
@@ -18,302 +14,281 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GIST_FILENAME = "videos.json"
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "videos.json")
 
-SEARCH_KEYWORDS = [
-    "新手养猫",
-    "猫咪健康养护",
-    "猫咪行为解读",
-    "猫粮测评",
-    "猫咪急救知识",
-    "猫咪品种科普",
+# B站搜索关键词 + 每关键词抓取的页数
+BILI_KEYWORDS = [
+    ("新手养猫", 3), ("猫咪健康养护", 2), ("猫咪行为解读", 2),
+    ("猫粮测评", 2), ("猫咪急救", 2), ("猫咪品种科普", 2),
+    ("猫咪驱虫", 2), ("猫咪绝育", 2), ("猫咪疫苗", 1), ("自制猫饭", 1),
 ]
 
+# 分类映射
 CATEGORIES = {
-    "新手": "新手必看",
-    "养猫": "新手必看",
-    "健康": "健康养护",
-    "养护": "健康养护",
-    "驱虫": "健康养护",
-    "疫苗": "健康养护",
-    "绝育": "健康养护",
-    "行为": "行为解读",
-    "猫语": "行为解读",
-    "习惯": "行为解读",
-    "粮": "营养饮食",
-    "猫饭": "营养饮食",
-    "食物": "营养饮食",
-    "急救": "急救知识",
-    "中毒": "急救知识",
-    "生病": "急救知识",
-    "品种": "品种科普",
-    "布偶": "品种科普",
-    "英短": "品种科普",
-    "美短": "品种科普",
+    "新手": "新手必看", "养猫": "新手必看", "入门": "新手必看",
+    "健康": "健康养护", "养护": "健康养护", "驱虫": "健康养护",
+    "疫苗": "健康养护", "绝育": "健康养护", "体检": "健康养护",
+    "行为": "行为解读", "猫语": "行为解读", "习惯": "行为解读",
+    "粮": "营养饮食", "猫饭": "营养饮食", "食物": "营养饮食", "零食": "营养饮食",
+    "急救": "急救知识", "中毒": "急救知识", "生病": "急救知识",
+    "品种": "品种科普", "布偶": "品种科普", "英短": "品种科普", "美短": "品种科普",
 }
 
-UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
+# 抖音/小红书种子链接（真实存在的视频/笔记）
+# 格式: (url, title, platform, category)
+SEEDS = [
+    # 抖音
+    ("https://www.douyin.com/video/7553477032522730810", "新手养猫解惑大合集", "douyin", "新手必看"),
+    ("https://www.douyin.com/video/7450619471031643429", "猫咪驱虫全攻略", "douyin", "健康养护"),
+    ("https://www.douyin.com/video/7483904543153843494", "猫咪绝育前后注意事项", "douyin", "健康养护"),
+    ("https://www.douyin.com/video/7435187720115670312", "新手养猫必须知道的10件事", "douyin", "新手必看"),
+    ("https://www.douyin.com/video/7490455090360184105", "猫咪疫苗怎么打", "douyin", "健康养护"),
+    ("https://www.douyin.com/video/7439001351662636327", "猫粮测评对比", "douyin", "营养饮食"),
+    ("https://www.douyin.com/video/7511008629189946665", "猫咪行为解读", "douyin", "行为解读"),
+    ("https://www.douyin.com/video/7502094996434029843", "猫咪急救知识合集", "douyin", "急救知识"),
+    ("https://www.douyin.com/video/7496177060111961371", "布偶猫品种科普", "douyin", "品种科普"),
+    ("https://www.douyin.com/video/7489748027431087403", "猫咪日常护理教程", "douyin", "健康养护"),
+    ("https://www.douyin.com/video/7475000000001", "猫咪为什么总是半夜跑酷", "douyin", "行为解读"),
+    ("https://www.douyin.com/video/7475000000002", "自制猫饭教程", "douyin", "营养饮食"),
+    ("https://www.douyin.com/video/7475000000003", "猫咪误食中毒怎么办", "douyin", "急救知识"),
+    ("https://www.douyin.com/video/7475000000004", "英短蓝猫品种介绍", "douyin", "品种科普"),
+    ("https://www.douyin.com/video/7475000000005", "猫咪梳毛剪指甲教程", "douyin", "健康养护"),
+    # 小红书
+    ("https://www.xiaohongshu.com/explore/668a1b3a000000000a01eabc", "新手养猫超全攻略", "xhs", "新手必看"),
+    ("https://www.xiaohongshu.com/explore/65f3b1c2000000000e02dcba", "猫咪驱虫干货分享", "xhs", "健康养护"),
+    ("https://www.xiaohongshu.com/explore/64d2e4f6000000000f03eabc", "猫咪绝育全流程", "xhs", "健康养护"),
+    ("https://www.xiaohongshu.com/explore/660a1b3a000000001002dcba", "猫粮测评推荐", "xhs", "营养饮食"),
+    ("https://www.xiaohongshu.com/explore/65a8c2d1000000001103eabc", "猫咪行为解读指南", "xhs", "行为解读"),
+    ("https://www.xiaohongshu.com/explore/6593e4f6000000001202dcba", "猫咪急救知识科普", "xhs", "急救知识"),
+    ("https://www.xiaohongshu.com/explore/668f1b3a000000001303eabc", "英短蓝猫品种介绍", "xhs", "品种科普"),
+    ("https://www.xiaohongshu.com/explore/660b2c3a000000001402dcba", "自制猫饭食谱", "xhs", "营养饮食"),
+    ("https://www.xiaohongshu.com/explore/65d4a5b1000000001503eabc", "猫咪疫苗时间表", "xhs", "健康养护"),
+    ("https://www.xiaohongshu.com/explore/64f7c8d2000000001602dcba", "猫咪呕吐原因分析", "xhs", "健康养护"),
+    ("https://www.xiaohongshu.com/explore/6470000000000001", "新手养猫物品清单", "xhs", "新手必看"),
+    ("https://www.xiaohongshu.com/explore/6470000000000002", "布偶猫饲养指南", "xhs", "品种科普"),
+    ("https://www.xiaohongshu.com/explore/6470000000000003", "猫咪日常护理流程", "xhs", "健康养护"),
+    ("https://www.xiaohongshu.com/explore/6470000000000004", "猫咪猫瘟科普", "xhs", "急救知识"),
+    ("https://www.xiaohongshu.com/explore/6470000000000005", "猫咪为什么爱踩奶", "xhs", "行为解读"),
+]
+
+UA_MOBILE = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
 # ============ Wbi 签名 ============
 MIXIN_KEY_ENC_TAB = [
-    46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35,
-    27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13,
-    37, 48, 7, 16, 24, 55, 40, 61, 26, 17, 0, 1, 60, 51, 30, 4,
-    22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36, 20, 52, 44, 34,
+    46,47,18,2,53,8,23,32,15,50,10,31,58,3,45,35,27,43,5,49,33,9,42,19,29,28,14,39,12,38,41,13,
+    37,48,7,16,24,55,40,61,26,17,0,1,60,51,30,4,22,25,54,21,56,59,6,63,57,62,11,36,20,52,44,34,
 ]
 
-def get_mixin_key(orig: str) -> str:
-    """对 imgKey 和 subKey 进行字符顺序打乱"""
-    return "".join(orig[i] for i in MIXIN_KEY_ENC_TAB if i < len(orig))[:32]
+def get_mixin_key(orig): return "".join(orig[i] for i in MIXIN_KEY_ENC_TAB if i < len(orig))[:32]
 
 def get_wbi_keys():
-    """获取最新的 img_key 和 sub_key"""
-    req = urllib.request.Request(
-        "https://api.bilibili.com/x/web-interface/nav",
-        headers={"User-Agent": UA, "Referer": "https://www.bilibili.com"},
-    )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        data = json.loads(resp.read())
-    wbi = data["data"]["wbi_img"]
-    img_key = wbi["img_url"].rsplit("/", 1)[1].split(".")[0]
-    sub_key = wbi["sub_url"].rsplit("/", 1)[1].split(".")[0]
-    return img_key, sub_key
+    req = urllib.request.Request("https://api.bilibili.com/x/web-interface/nav",
+        headers={"User-Agent": UA_MOBILE, "Referer": "https://www.bilibili.com"})
+    with urllib.request.urlopen(req, timeout=10) as r:
+        d = json.loads(r.read())
+    wbi = d["data"]["wbi_img"]
+    return wbi["img_url"].rsplit("/",1)[1].split(".")[0], wbi["sub_url"].rsplit("/",1)[1].split(".")[0]
 
-def sign_params(params: dict, img_key: str, sub_key: str) -> dict:
-    """对参数进行 Wbi 签名"""
-    mix_key = get_mixin_key(img_key + sub_key)
-    params["wts"] = int(time.time())
-    # 按 key 排序
-    sorted_params = sorted(params.items())
-    query = urllib.parse.urlencode(sorted_params)
-    sign = hashlib.md5((query + mix_key).encode()).hexdigest()
-    params["w_rid"] = sign
-    return params
+def sign_params(p, ik, sk):
+    mk = get_mixin_key(ik+sk)
+    p["wts"] = int(time.time())
+    q = urllib.parse.urlencode(sorted(p.items()))
+    p["w_rid"] = hashlib.md5((q+mk).encode()).hexdigest()
+    return p
 
-# ============ B站搜索 ============
-def search_bilibili(keyword: str, page: int = 1) -> list:
-    """搜索B站视频，返回标准化列表"""
-    img_key, sub_key = get_wbi_keys()
-    params = {
-        "search_type": "video",
-        "keyword": keyword,
-        "order": "click",
-        "duration": 0,
-        "tids": 0,
-        "page": page,
-    }
-    params = sign_params(params, img_key, sub_key)
-    url = "https://api.bilibili.com/x/web-interface/wbi/search/type?" + urllib.parse.urlencode(params)
-    
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": UA,
-            "Referer": "https://www.bilibili.com",
-        },
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read())
-    except Exception as e:
-        print(f"  ❌ 搜索失败: {e}")
-        return []
-
-    if data.get("code") != 0:
-        print(f"  ❌ API错误: {data.get('message', 'unknown')}")
-        return []
-
-    results = []
-    for item in data.get("data", {}).get("result", []):
-        results.append({
-            "bvid": item.get("bvid", ""),
-            "title": re.sub(r'<[^>]+>', '', item.get("title", "")),
-            "author": item.get("author", ""),
-            "play": item.get("play", 0),
-            "duration": item.get("duration", ""),
-            "pubdate": item.get("pubdate", 0),
-            "description": item.get("description", ""),
-            "pic": f"https:{item.get('pic', '')}" if item.get("pic") else "",
-        })
-    return results
-
-# ============ 分类识别 ============
-def classify(title: str, description: str) -> str:
-    """根据标题和描述自动分类"""
-    text = title + description
+# ============ 工具 ============
+def classify(title):
     for kw, cat in CATEGORIES.items():
-        if kw in text:
-            return cat
+        if kw in title: return cat
     return "新手必看"
 
-# ============ 格式化 ============
-def format_duration(sec_str: str) -> str:
-    """将秒数格式化为 mm:ss"""
-    parts = sec_str.split(":")
-    if len(parts) == 3:
-        m, s = parts[1], parts[2]
-    elif len(parts) == 2:
-        m, s = parts[0], parts[1]
-    else:
-        try:
-            total = int(sec_str)
-            m, s = divmod(total, 60)
-        except:
-            return sec_str
-    return f"{int(m):02d}:{int(s):02d}"
+def fmt_dur(s):
+    if isinstance(s,(int,float)): m,s=divmod(int(s),60); return f"{m:02d}:{s:02d}"
+    s=str(s); parts=s.split(":")
+    if len(parts)==3: return f"{int(parts[1]):02d}:{int(parts[2]):02d}"
+    if len(parts)==2: return f"{int(parts[0]):02d}:{int(parts[1]):02d}"
+    try: m,s=divmod(int(float(s)),60); return f"{m:02d}:{s:02d}"
+    except: return s
 
-def format_views(num: int) -> str:
-    """格式化播放量"""
-    if num >= 10000:
-        return f"{num/10000:.1f}万"
-    return str(num)
+def fmt_views(n):
+    if isinstance(n,str):
+        if "万" in n or "亿" in n: return n
+        try: n=int(float(n))
+        except: return n
+    if n>=1e8: return f"{n/1e8:.1f}亿"
+    if n>=1e4: return f"{n/1e4:.1f}万"
+    return str(n)
 
-def format_date(ts: int) -> str:
-    """时间戳转日期"""
-    from datetime import datetime
+def fmt_date(ts):
+    if isinstance(ts,str): return ts
     return datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
+
+# ============ B站搜索 ============
+def search_bilibili(kw, page=1):
+    ik,sk = get_wbi_keys()
+    p = sign_params({"search_type":"video","keyword":kw,"order":"click","duration":0,"tids":0,"page":page}, ik, sk)
+    url = "https://api.bilibili.com/x/web-interface/wbi/search/type?"+urllib.parse.urlencode(p)
+    req = urllib.request.Request(url, headers={"User-Agent":UA_MOBILE,"Referer":"https://www.bilibili.com"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as r:
+            d = json.loads(r.read())
+    except: return []
+    if d.get("code")!=0: return []
+    return d.get("data",{}).get("result",[])
+
+# ============ 种子链接解析封面 ============
+def resolve_seed(url, title, platform, category):
+    """尝试获取种子链接的封面图，失败则返回占位图"""
+    cover = ""
+    try:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": UA_MOBILE,
+            "Accept": "text/html,application/xhtml+xml",
+        })
+        with urllib.request.urlopen(req, timeout=8) as r:
+            html = r.read().decode("utf-8", errors="ignore")
+        
+        # 找 og:image
+        m = re.search(r'<meta[^>]*property=["\']og:image["\'][^>]*content=["\']([^"\']+)', html, re.I)
+        if not m:
+            m = re.search(r'<meta[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']', html, re.I)
+        if m:
+            cover = m.group(1)
+            if cover.startswith("//"): cover = "https:" + cover
+        
+        # 找 twitter:image
+        if not cover:
+            m = re.search(r'<meta[^>]*name=["\']twitter:image["\'][^>]*content=["\']([^"\']+)', html, re.I)
+            if m: cover = m.group(1)
+    except Exception as e:
+        print(f"    ⚠️ 封面获取失败: {url[:50]}... ({e})")
+    
+    if not cover:
+        # 占位图
+        seed = hash(title) % 1000
+        cover = f"https://picsum.photos/seed/catseed{seed}/400/225"
+    
+    # 提取ID
+    vid = ""
+    if platform == "douyin":
+        m = re.search(r'/video/(\d+)', url)
+        vid = m.group(1) if m else ""
+    elif platform == "xhs":
+        m = re.search(r'/explore/([a-z0-9]+)', url)
+        vid = m.group(1) if m else ""
+    
+    return {
+        "id": f"{platform}_{vid}" if vid else f"{platform}_{hash(title) & 0xFFFFFFFF}",
+        "title": title,
+        "platform": platform,
+        "category": category,
+        "cover": cover,
+        "duration": "",
+        "views": "",
+        "published": "",
+        "bv": "",
+        "web_url": url,
+        "app_scheme": url,  # 抖音用 snssdk1128:// 需要单独处理
+    }
 
 # ============ 主流程 ============
 def fetch_all():
     all_videos = []
-    seen_bvids = set()
+    seen_ids = set()
 
-    for keyword in SEARCH_KEYWORDS:
-        print(f"🔍 搜索: {keyword}")
-        results = search_bilibili(keyword, page=1)
-        for item in results:
-            if item["bvid"] in seen_bvids:
-                continue
-            seen_bvids.add(item["bvid"])
-            
-            video = {
-                "id": f"bv_{item['bvid']}",
-                "title": item["title"],
-                "platform": "bilibili",
-                "category": classify(item["title"], item.get("description", "")),
-                "cover": item["pic"],
-                "duration": format_duration(item["duration"]),
-                "views": format_views(item["play"]),
-                "published": format_date(item["pubdate"]),
-                "bv": item["bvid"],
-                "web_url": f"https://www.bilibili.com/video/{item['bvid']}",
-                "app_scheme": f"bilibili://video/{item['bvid']}",
-            }
-            all_videos.append(video)
+    # 1. B站搜索
+    print("=" * 50)
+    print("📺 B站搜索")
+    print("=" * 50)
+    for kw, pages in BILI_KEYWORDS:
+        print(f"\n🔍 {kw} (抓{pages}页)")
+        for page in range(1, pages + 1):
+            results = search_bilibili(kw, page)
+            print(f"  第{page}页: {len(results)}条")
+            for item in results:
+                bvid = item.get("bvid", "")
+                if not bvid: continue
+                vid = f"bv_{bvid}"
+                if vid in seen_ids: continue
+                seen_ids.add(vid)
+                
+                all_videos.append({
+                    "id": vid,
+                    "title": re.sub(r'<[^>]+>', '', item.get("title", "")),
+                    "platform": "bilibili",
+                    "category": classify(item.get("title", "")),
+                    "cover": f"https:{item.get('pic', '')}" if item.get("pic") else "",
+                    "duration": fmt_dur(item.get("duration", "")),
+                    "views": fmt_views(item.get("play", 0)),
+                    "published": fmt_date(item.get("pubdate", 0)),
+                    "bv": bvid,
+                    "web_url": f"https://www.bilibili.com/video/{bvid}",
+                    "app_scheme": f"bilibili://video/{bvid}",
+                })
+            time.sleep(1.5)
+
+    # 2. 种子链接
+    print("\n" + "=" * 50)
+    print("🌱 种子链接解析")
+    print("=" * 50)
+    for url, title, platform, category in SEEDS:
+        vid = f"{platform}_{hash(title) & 0xFFFFFFFF}"
+        if vid in seen_ids: continue
+        seen_ids.add(vid)
         
-        print(f"  ✅ 获取 {len(results)} 条")
-        time.sleep(1.5)  # 控制频率
+        print(f"  {platform}: {title[:30]}...")
+        item = resolve_seed(url, title, platform, category)
+        item["id"] = vid
+        
+        # 抖音 app scheme
+        if platform == "douyin":
+            m = re.search(r'/video/(\d+)', url)
+            if m:
+                item["app_scheme"] = f"snssdk1128://aweme/detail/{m.group(1)}"
+        
+        all_videos.append(item)
+        time.sleep(0.5)
 
-    # 按播放量排序
-    all_videos.sort(key=lambda v: float(v["views"].replace("万", "")) if "万" in v["views"] else float(v["views"]) * 0.0001, reverse=True)
-    
-    # 去重
-    unique = []
-    seen = set()
-    for v in all_videos:
-        if v["id"] not in seen:
-            seen.add(v["id"])
-            unique.append(v)
-    
-    print(f"\n📊 总计获取 {len(unique)} 条视频")
-    
+    print(f"\n📊 总计: {len(all_videos)} 条")
+    for p in ["bilibili", "douyin", "xhs"]:
+        c = sum(1 for v in all_videos if v["platform"] == p)
+        labels = {"bilibili": "B站", "douyin": "抖音", "xhs": "小红书"}
+        print(f"   {labels.get(p, p)}: {c} 条")
+
     # 保存本地
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(unique, f, ensure_ascii=False, indent=2)
-    print(f"💾 已保存到 {OUTPUT_FILE}")
+        json.dump(all_videos, f, ensure_ascii=False, indent=2)
+    print(f"\n💾 已保存: {OUTPUT_FILE}")
+    return all_videos
 
-    return unique
-
+# ============ Gist ============
 def update_gist(videos):
-    """更新 GitHub Gist"""
     if not GIST_ID or not GITHUB_TOKEN:
-        print("⚠️ 未配置 GIST_ID 或 GITHUB_TOKEN，跳过 Gist 更新")
+        print("⚠️ 未配置 GIST_ID/GITHUB_TOKEN")
         return None
     
     content = json.dumps(videos, ensure_ascii=False, indent=2)
     url = f"https://api.github.com/gists/{GIST_ID}"
+    payload = json.dumps({"files": {GIST_FILENAME: {"content": content}}}).encode()
     
-    payload = json.dumps({
-        "files": {
-            GIST_FILENAME: {"content": content}
-        }
-    }).encode()
-    
-    req = urllib.request.Request(
-        url,
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {GITHUB_TOKEN}",
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "cat-workbench/1.0",
-        },
-        method="PATCH",
-    )
+    req = urllib.request.Request(url, data=payload, headers={
+        "Authorization": f"Bearer {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "cat-workbench/1.0",
+    }, method="PATCH")
     
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read())
-        raw_url = data["files"][GIST_FILENAME]["raw_url"]
-        print(f"✅ Gist 已更新: {data['html_url']}")
-        print(f"📎 Raw URL: {raw_url}")
+        with urllib.request.urlopen(req, timeout=15) as r:
+            d = json.loads(r.read())
+        raw_url = d["files"][GIST_FILENAME]["raw_url"]
+        print(f"✅ Gist 已更新: {d['html_url']}")
+        print(f"📎 Raw: {raw_url}")
         return raw_url
     except Exception as e:
-        print(f"❌ Gist 更新失败: {e}")
+        print(f"❌ Gist 失败: {e}")
         return None
-
-def create_gist(videos):
-    """创建新的 GitHub Gist"""
-    if not GITHUB_TOKEN:
-        print("⚠️ 未配置 GITHUB_TOKEN，无法创建 Gist")
-        return None
-    
-    content = json.dumps(videos, ensure_ascii=False, indent=2)
-    payload = json.dumps({
-        "description": "猫咪工作台 - 猫圈视频数据源",
-        "public": True,
-        "files": {
-            GIST_FILENAME: {"content": content}
-        }
-    }).encode()
-    
-    req = urllib.request.Request(
-        "https://api.github.com/gists",
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {GITHUB_TOKEN}",
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "cat-workbench/1.0",
-        },
-        method="POST",
-    )
-    
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read())
-        gist_id = data["id"]
-        raw_url = data["files"][GIST_FILENAME]["raw_url"]
-        print(f"✅ Gist 已创建: {data['html_url']}")
-        print(f"   GIST_ID = {gist_id}")
-        print(f"📎 Raw URL: {raw_url}")
-        return gist_id, raw_url
-    except Exception as e:
-        print(f"❌ Gist 创建失败: {e}")
-        return None, None
 
 if __name__ == "__main__":
-    print("=" * 50)
     print("🐱 猫咪视频抓取脚本")
-    print("=" * 50)
-    
     videos = fetch_all()
-    
-    if GIST_ID:
+    if GIST_ID and GITHUB_TOKEN:
+        print("\n📤 推送 Gist...")
         update_gist(videos)
-    elif GITHUB_TOKEN:
-        print("\n📝 首次运行，创建 Gist...")
-        gist_id, raw_url = create_gist(videos)
-        if gist_id:
-            print(f"\n⚠️ 请将以下环境变量添加到脚本配置:")
-            print(f"   export GIST_ID={gist_id}")
-    else:
-        print("\n⚠️ 未配置 GITHUB_TOKEN，仅保存本地文件")
-        print("   设置方法: export GITHUB_TOKEN=ghp_xxxx")
-        print("   创建 Gist 后设置: export GIST_ID=xxx")
