@@ -1,0 +1,39 @@
+name: 猫咪视频自动抓取
+
+on:
+  schedule:
+    # 每7天 UTC 0:00 运行一次（北京时间早上8点）
+    - cron: '0 0 */7 * *'
+  workflow_dispatch: # 支持手动触发
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Run fetch script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: |
+          python3 scripts/fetch_videos.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/videos.json
+          git diff --staged --quiet || git commit -m "chore: 自动更新猫圈视频数据"
+          git push
