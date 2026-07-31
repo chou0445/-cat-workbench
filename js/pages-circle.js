@@ -4,8 +4,9 @@
  */
 
 const Circle = (function () {
-  // Gist 数据源 URL（可替换为实际公开 Gist raw URL）
-  const GIST_URL = 'data/videos.json';
+  // Gist 数据源 URL（公开 Gist raw URL，由脚本自动更新）
+  const GIST_RAW_URL = 'https://gist.githubusercontent.com/chou0445/0a6c4b9f92ef51a997ecb53f6d5cf04d/raw/videos.json';
+  const LOCAL_FALLBACK = 'data/videos.json';
   const PAGE_SIZE = 8;
 
   let allVideos = [];
@@ -26,36 +27,38 @@ const Circle = (function () {
   async function loadVideos(force = false) {
     // 先读缓存
     const cache = Store.getCircleCache();
-    if (cache && !force) {
-      allVideos = cache.data || [];
+    if (cache && !force && cache.data && cache.data.length > 0) {
+      allVideos = cache.data;
       return allVideos;
     }
 
+    // 尝试从 Gist 读取
     try {
-      // 尝试从 Gist 读取
-      const response = await fetch(GIST_URL, { cache: 'no-cache' });
+      const response = await fetch(GIST_RAW_URL + '?t=' + Date.now(), { cache: 'no-cache' });
       if (response.ok) {
         allVideos = await response.json();
         Store.saveCircleCache(allVideos);
         return allVideos;
       }
-      throw new Error('Fetch failed');
     } catch (e) {
-      // 降级使用缓存
-      if (cache) {
-        allVideos = cache.data || [];
-        return allVideos;
-      }
-      // 最后降级使用本地数据
-      try {
-        const res = await fetch('data/videos.json');
-        allVideos = await res.json();
-        Store.saveCircleCache(allVideos);
-        return allVideos;
-      } catch (e2) {
-        allVideos = [];
-        return [];
-      }
+      console.warn('Gist fetch failed, trying fallback...');
+    }
+
+    // 降级使用缓存
+    if (cache && cache.data && cache.data.length > 0) {
+      allVideos = cache.data;
+      return allVideos;
+    }
+
+    // 最后降级使用本地数据
+    try {
+      const res = await fetch(LOCAL_FALLBACK);
+      allVideos = await res.json();
+      Store.saveCircleCache(allVideos);
+      return allVideos;
+    } catch (e2) {
+      allVideos = [];
+      return [];
     }
   }
 
