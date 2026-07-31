@@ -916,7 +916,7 @@
     "category": "健康养护",
     "cover": "https://i0.hdslb.com/bfs/archive/549635a37c5bacf7d64444999c51ed372fd3ad67.jpg",
     "duration": "00:58",
-    "views": "1995",
+    "views": "2039",
     "published": "2026-07-14",
     "bv": "BV14dNX6VEtk",
     "web_url": "https://www.bilibili.com/video/BV14dNX6VEtk",
@@ -1255,7 +1255,7 @@
     "cover": "https://i0.hdslb.com/bfs/archive/86f492f923d54c7ba028e98b45b771f41a196cc5.jpg",
     "duration": "01:44",
     "views": "218",
-    "published": "2023-05-18",
+    "published": "2023-05-17",
     "bv": "BV1NM4y1q7Pb",
     "web_url": "https://www.bilibili.com/video/BV1NM4y1q7Pb",
     "app_scheme": "bilibili://video/BV1NM4y1q7Pb"
@@ -1619,7 +1619,7 @@
     "cover": "https://i2.hdslb.com/bfs/archive/64e8f87d51b9593c9d61b0433228d21fddd5f4ea.jpg",
     "duration": "01:28",
     "views": "8.8万",
-    "published": "2023-05-12",
+    "published": "2023-05-11",
     "bv": "BV1cT411t7bm",
     "web_url": "https://www.bilibili.com/video/BV1cT411t7bm",
     "app_scheme": "bilibili://video/BV1cT411t7bm"
@@ -1801,7 +1801,7 @@
     "cover": "https://i2.hdslb.com/bfs/archive/6435e8f08f329adf42ab5fafd20dd82f4b6becb3.jpg",
     "duration": "01:19",
     "views": "5.1万",
-    "published": "2023-04-05",
+    "published": "2023-04-04",
     "bv": "BV1Ka4y1u79R",
     "web_url": "https://www.bilibili.com/video/BV1Ka4y1u79R",
     "app_scheme": "bilibili://video/BV1Ka4y1u79R"
@@ -1839,7 +1839,7 @@
     "category": "营养饮食",
     "cover": "https://i0.hdslb.com/bfs/archive/b79148c37d7e2143f2a3d1d5c1ce51f147844446.jpg",
     "duration": "07:15",
-    "views": "56.6万",
+    "views": "56.7万",
     "published": "2026-05-19",
     "bv": "BV1mdLz6wErx",
     "web_url": "https://www.bilibili.com/video/BV1mdLz6wErx",
@@ -2065,19 +2065,6 @@
     "bv": "BV1cZ4y1S7YY",
     "web_url": "https://www.bilibili.com/video/BV1cZ4y1S7YY",
     "app_scheme": "bilibili://video/BV1cZ4y1S7YY"
-  },
-  {
-    "id": "bv_BV1gE421K7eU",
-    "title": "耗时三天!一次性给你们盘清!国内外39款风大猫粮,看完这份跑毒攻略后,感觉自己现在强的可怕…",
-    "platform": "bilibili",
-    "category": "营养饮食",
-    "cover": "https://i1.hdslb.com/bfs/archive/b41325caee0be21ef903cb31e1669d08d03bf173.jpg",
-    "duration": "03:25",
-    "views": "21.5万",
-    "published": "2024-04-17",
-    "bv": "BV1gE421K7eU",
-    "web_url": "https://www.bilibili.com/video/BV1gE421K7eU",
-    "app_scheme": "bilibili://video/BV1gE421K7eU"
   },
   {
     "id": "bv_BV1ofiRYmEWf",
@@ -2327,6 +2314,19 @@
     "app_scheme": "bilibili://video/BV1ozYYewEBh"
   },
   {
+    "id": "bv_BV1kmCRYrExc",
+    "title": "这些猫粮代工厂的翻车瓜还有哪个养猫人不知道？ 细数近期国内猫粮代工厂大瓜，铲屎官一定要学会看工厂选猫粮！",
+    "platform": "bilibili",
+    "category": "新手必看",
+    "cover": "https://i2.hdslb.com/bfs/archive/49e57ee3a50fd492b1497c41afa9c4c950f506fa.jpg",
+    "duration": "01:40",
+    "views": "13.2万",
+    "published": "2024-10-19",
+    "bv": "BV1kmCRYrExc",
+    "web_url": "https://www.bilibili.com/video/BV1kmCRYrExc",
+    "app_scheme": "bilibili://video/BV1kmCRYrExc"
+  },
+  {
     "id": "bv_BV1Ht4y1v7Ba",
     "title": "惊险！千钧一发 男婴险坠楼家猫急救命",
     "platform": "bilibili",
@@ -2346,7 +2346,7 @@
     "category": "急救知识",
     "cover": "https://i0.hdslb.com/bfs/archive/7f754507d6c28a8b6e37c7df1684ce18a8e53e43.jpg",
     "duration": "05:29",
-    "views": "39.1万",
+    "views": "39.2万",
     "published": "2026-07-22",
     "bv": "BV1Lwgk6MEvC",
     "web_url": "https://www.bilibili.com/video/BV1Lwgk6MEvC",
@@ -3075,7 +3075,7 @@
     "cover": "https://i2.hdslb.com/bfs/archive/8780526cf13c8e8de85d2a2a59e261f26a9fc139.jpg",
     "duration": "03:45",
     "views": "7.7万",
-    "published": "2020-06-28",
+    "published": "2020-06-27",
     "bv": "BV1V5411Y7z1",
     "web_url": "https://www.bilibili.com/video/BV1V5411Y7z1",
     "app_scheme": "bilibili://video/BV1V5411Y7z1"
@@ -3516,7 +3516,7 @@
     "category": "新手必看",
     "cover": "https://i0.hdslb.com/bfs/archive/a2260eb451b652c136f78fb843a98dbcfc8764ec.jpg",
     "duration": "01:41",
-    "views": "79.5万",
+    "views": "79.8万",
     "published": "2026-06-29",
     "bv": "BV1NMTL6BEQ9",
     "web_url": "https://www.bilibili.com/video/BV1NMTL6BEQ9",
@@ -3660,7 +3660,7 @@
     "cover": "https://i1.hdslb.com/bfs/archive/5e04d52c4e9bac377cebf30da281273f2626bc42.jpg",
     "duration": "05:37",
     "views": "37.4万",
-    "published": "2024-08-21",
+    "published": "2024-08-20",
     "bv": "BV1w142187Xb",
     "web_url": "https://www.bilibili.com/video/BV1w142187Xb",
     "app_scheme": "bilibili://video/BV1w142187Xb"
@@ -3672,7 +3672,7 @@
     "category": "健康养护",
     "cover": "https://i0.hdslb.com/bfs/archive/adb300ad0dc16dd555ccb0498f8e47b140c1762a.jpg",
     "duration": "02:24",
-    "views": "35.7万",
+    "views": "35.8万",
     "published": "2026-06-29",
     "bv": "BV1paT56PEmk",
     "web_url": "https://www.bilibili.com/video/BV1paT56PEmk",
@@ -3946,7 +3946,7 @@
     "cover": "https://i2.hdslb.com/bfs/archive/64fd4ef8c76ea3853177b060b5cfe91706a9c749.jpg",
     "duration": "00:27",
     "views": "324.4万",
-    "published": "2022-02-05",
+    "published": "2022-02-04",
     "bv": "BV135411f7Uq",
     "web_url": "https://www.bilibili.com/video/BV135411f7Uq",
     "app_scheme": "bilibili://video/BV135411f7Uq"
@@ -4102,7 +4102,7 @@
     "cover": "https://i2.hdslb.com/bfs/archive/92158e7d2314143f6ec2e783dba64f7457b21a50.jpg",
     "duration": "03:25",
     "views": "129.4万",
-    "published": "2021-10-22",
+    "published": "2021-10-21",
     "bv": "BV1Tq4y1G75f",
     "web_url": "https://www.bilibili.com/video/BV1Tq4y1G75f",
     "app_scheme": "bilibili://video/BV1Tq4y1G75f"
@@ -4206,7 +4206,7 @@
     "cover": "https://i2.hdslb.com/bfs/archive/f412ca6282591e3e5a16c09283ebd320edc08337.png",
     "duration": "06:58",
     "views": "108.3万",
-    "published": "2020-04-25",
+    "published": "2020-04-24",
     "bv": "BV1VQ4y1T7JH",
     "web_url": "https://www.bilibili.com/video/BV1VQ4y1T7JH",
     "app_scheme": "bilibili://video/BV1VQ4y1T7JH"
@@ -4914,11 +4914,11 @@
     "app_scheme": "bilibili://video/BV1PM4y1z7cR"
   },
   {
-    "id": "douyin_1526117521",
+    "id": "douyin_3438006937",
     "title": "新手养猫解惑大合集",
     "platform": "douyin",
     "category": "新手必看",
-    "cover": "https://picsum.photos/seed/catseed537/400/225",
+    "cover": "https://picsum.photos/seed/catseed849/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -4927,11 +4927,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7553477032522730810"
   },
   {
-    "id": "douyin_1200655568",
+    "id": "douyin_2139901975",
     "title": "猫咪驱虫全攻略",
     "platform": "douyin",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed960/400/225",
+    "cover": "https://picsum.photos/seed/catseed127/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -4940,11 +4940,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7450619471031643429"
   },
   {
-    "id": "douyin_2756113282",
+    "id": "douyin_3007630619",
     "title": "猫咪绝育前后注意事项",
     "platform": "douyin",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed554/400/225",
+    "cover": "https://picsum.photos/seed/catseed987/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -4953,11 +4953,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7483904543153843494"
   },
   {
-    "id": "douyin_1179361929",
+    "id": "douyin_1240335874",
     "title": "新手养猫必须知道的10件事",
     "platform": "douyin",
     "category": "新手必看",
-    "cover": "https://picsum.photos/seed/catseed937/400/225",
+    "cover": "https://picsum.photos/seed/catseed594/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -4966,11 +4966,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7435187720115670312"
   },
   {
-    "id": "douyin_1160142229",
+    "id": "douyin_151916851",
     "title": "猫咪疫苗怎么打",
     "platform": "douyin",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed125/400/225",
+    "cover": "https://picsum.photos/seed/catseed763/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -4979,11 +4979,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7490455090360184105"
   },
   {
-    "id": "douyin_3967377303",
+    "id": "douyin_2049588707",
     "title": "猫粮测评对比",
     "platform": "douyin",
     "category": "营养饮食",
-    "cover": "https://picsum.photos/seed/catseed343/400/225",
+    "cover": "https://picsum.photos/seed/catseed75/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -4992,11 +4992,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7439001351662636327"
   },
   {
-    "id": "douyin_658814101",
+    "id": "douyin_479793594",
     "title": "猫咪行为解读",
     "platform": "douyin",
     "category": "行为解读",
-    "cover": "https://picsum.photos/seed/catseed589/400/225",
+    "cover": "https://picsum.photos/seed/catseed514/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5005,11 +5005,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7511008629189946665"
   },
   {
-    "id": "douyin_2341019803",
+    "id": "douyin_976086785",
     "title": "猫咪急救知识合集",
     "platform": "douyin",
     "category": "急救知识",
-    "cover": "https://picsum.photos/seed/catseed331/400/225",
+    "cover": "https://picsum.photos/seed/catseed929/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5018,11 +5018,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7502094996434029843"
   },
   {
-    "id": "douyin_1303787195",
+    "id": "douyin_2466915313",
     "title": "布偶猫品种科普",
     "platform": "douyin",
     "category": "品种科普",
-    "cover": "https://picsum.photos/seed/catseed787/400/225",
+    "cover": "https://picsum.photos/seed/catseed113/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5031,11 +5031,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7496177060111961371"
   },
   {
-    "id": "douyin_2671461035",
+    "id": "douyin_1441030430",
     "title": "猫咪日常护理教程",
     "platform": "douyin",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed91/400/225",
+    "cover": "https://picsum.photos/seed/catseed342/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5044,11 +5044,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7489748027431087403"
   },
   {
-    "id": "douyin_63398816",
+    "id": "douyin_1821256775",
     "title": "猫咪为什么总是半夜跑酷",
     "platform": "douyin",
     "category": "行为解读",
-    "cover": "https://picsum.photos/seed/catseed336/400/225",
+    "cover": "https://picsum.photos/seed/catseed431/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5057,11 +5057,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7475000000001"
   },
   {
-    "id": "douyin_889772266",
+    "id": "douyin_2986517458",
     "title": "自制猫饭教程",
     "platform": "douyin",
     "category": "营养饮食",
-    "cover": "https://picsum.photos/seed/catseed346/400/225",
+    "cover": "https://picsum.photos/seed/catseed42/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5070,11 +5070,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7475000000002"
   },
   {
-    "id": "douyin_161573193",
+    "id": "douyin_775686637",
     "title": "猫咪误食中毒怎么办",
     "platform": "douyin",
     "category": "急救知识",
-    "cover": "https://picsum.photos/seed/catseed537/400/225",
+    "cover": "https://picsum.photos/seed/catseed341/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5083,11 +5083,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7475000000003"
   },
   {
-    "id": "douyin_2362276001",
+    "id": "douyin_3243728181",
     "title": "英短蓝猫品种介绍",
     "platform": "douyin",
     "category": "品种科普",
-    "cover": "https://picsum.photos/seed/catseed521/400/225",
+    "cover": "https://picsum.photos/seed/catseed293/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5096,11 +5096,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7475000000004"
   },
   {
-    "id": "douyin_400897814",
+    "id": "douyin_1781054704",
     "title": "猫咪梳毛剪指甲教程",
     "platform": "douyin",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed334/400/225",
+    "cover": "https://picsum.photos/seed/catseed272/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5109,11 +5109,11 @@
     "app_scheme": "snssdk1128://aweme/detail/7475000000005"
   },
   {
-    "id": "xhs_1900176365",
+    "id": "xhs_1481493828",
     "title": "新手养猫超全攻略",
     "platform": "xhs",
     "category": "新手必看",
-    "cover": "https://picsum.photos/seed/catseed749/400/225",
+    "cover": "https://picsum.photos/seed/catseed732/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5122,11 +5122,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/668a1b3a000000000a01eabc"
   },
   {
-    "id": "xhs_4258347586",
+    "id": "xhs_1447142537",
     "title": "猫咪驱虫干货分享",
     "platform": "xhs",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed810/400/225",
+    "cover": "https://picsum.photos/seed/catseed705/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5135,11 +5135,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/65f3b1c2000000000e02dcba"
   },
   {
-    "id": "xhs_58648475",
+    "id": "xhs_4099393251",
     "title": "猫咪绝育全流程",
     "platform": "xhs",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed315/400/225",
+    "cover": "https://picsum.photos/seed/catseed587/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5148,11 +5148,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/64d2e4f6000000000f03eabc"
   },
   {
-    "id": "xhs_343100078",
+    "id": "xhs_744709531",
     "title": "猫粮测评推荐",
     "platform": "xhs",
     "category": "营养饮食",
-    "cover": "https://picsum.photos/seed/catseed950/400/225",
+    "cover": "https://picsum.photos/seed/catseed627/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5161,11 +5161,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/660a1b3a000000001002dcba"
   },
   {
-    "id": "xhs_626224222",
+    "id": "xhs_123799618",
     "title": "猫咪行为解读指南",
     "platform": "xhs",
     "category": "行为解读",
-    "cover": "https://picsum.photos/seed/catseed934/400/225",
+    "cover": "https://picsum.photos/seed/catseed514/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5174,11 +5174,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/65a8c2d1000000001103eabc"
   },
   {
-    "id": "xhs_1017064047",
+    "id": "xhs_1127963134",
     "title": "猫咪急救知识科普",
     "platform": "xhs",
     "category": "急救知识",
-    "cover": "https://picsum.photos/seed/catseed311/400/225",
+    "cover": "https://picsum.photos/seed/catseed926/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5187,11 +5187,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/6593e4f6000000001202dcba"
   },
   {
-    "id": "xhs_2362276001",
+    "id": "xhs_3243728181",
     "title": "英短蓝猫品种介绍",
     "platform": "xhs",
     "category": "品种科普",
-    "cover": "https://picsum.photos/seed/catseed521/400/225",
+    "cover": "https://picsum.photos/seed/catseed293/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5200,11 +5200,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/668f1b3a000000001303eabc"
   },
   {
-    "id": "xhs_1109692791",
+    "id": "xhs_407215408",
     "title": "自制猫饭食谱",
     "platform": "xhs",
     "category": "营养饮食",
-    "cover": "https://picsum.photos/seed/catseed463/400/225",
+    "cover": "https://picsum.photos/seed/catseed520/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5213,11 +5213,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/660b2c3a000000001402dcba"
   },
   {
-    "id": "xhs_1623681285",
+    "id": "xhs_327757861",
     "title": "猫咪疫苗时间表",
     "platform": "xhs",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed517/400/225",
+    "cover": "https://picsum.photos/seed/catseed917/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5226,11 +5226,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/65d4a5b1000000001503eabc"
   },
   {
-    "id": "xhs_487625494",
+    "id": "xhs_423941212",
     "title": "猫咪呕吐原因分析",
     "platform": "xhs",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed462/400/225",
+    "cover": "https://picsum.photos/seed/catseed988/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5239,11 +5239,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/64f7c8d2000000001602dcba"
   },
   {
-    "id": "xhs_3818215891",
+    "id": "xhs_1373082444",
     "title": "新手养猫物品清单",
     "platform": "xhs",
     "category": "新手必看",
-    "cover": "https://picsum.photos/seed/catseed235/400/225",
+    "cover": "https://picsum.photos/seed/catseed60/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5252,11 +5252,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/6470000000000001"
   },
   {
-    "id": "xhs_2725869649",
+    "id": "xhs_200226599",
     "title": "布偶猫饲养指南",
     "platform": "xhs",
     "category": "品种科普",
-    "cover": "https://picsum.photos/seed/catseed305/400/225",
+    "cover": "https://picsum.photos/seed/catseed647/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5265,11 +5265,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/6470000000000002"
   },
   {
-    "id": "xhs_2038757297",
+    "id": "xhs_905440917",
     "title": "猫咪日常护理流程",
     "platform": "xhs",
     "category": "健康养护",
-    "cover": "https://picsum.photos/seed/catseed985/400/225",
+    "cover": "https://picsum.photos/seed/catseed901/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5278,11 +5278,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/6470000000000003"
   },
   {
-    "id": "xhs_1262410592",
+    "id": "xhs_22332624",
     "title": "猫咪猫瘟科普",
     "platform": "xhs",
     "category": "急救知识",
-    "cover": "https://picsum.photos/seed/catseed368/400/225",
+    "cover": "https://picsum.photos/seed/catseed416/400/225",
     "duration": "",
     "views": "",
     "published": "",
@@ -5291,11 +5291,11 @@
     "app_scheme": "https://www.xiaohongshu.com/explore/6470000000000004"
   },
   {
-    "id": "xhs_2777445503",
+    "id": "xhs_1571689172",
     "title": "猫咪为什么爱踩奶",
     "platform": "xhs",
     "category": "行为解读",
-    "cover": "https://picsum.photos/seed/catseed167/400/225",
+    "cover": "https://picsum.photos/seed/catseed916/400/225",
     "duration": "",
     "views": "",
     "published": "",
