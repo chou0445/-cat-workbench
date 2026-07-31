@@ -980,6 +980,12 @@ function renderSymptomRecord() {
       const presetNames = ${JSON.stringify(presetNames)};
 
       function addSymptom() {
+        var sevOpts = ['轻度','中度','重度'];
+        var sevHtml = sevOpts.map(function(n, i) {
+          return '<span class="tag-chip' + (i === 0 ? ' active' : '') + '" onclick="selectSingle(this,&quot;symSeverity&quot;)" data-value="' + n + '">' + n + '</span>';
+        }).join('');
+        var hospHtml = '<span class="tag-chip" onclick="selectSingle(this,&quot;symHospital&quot;);toggleHospitalNote(this)" data-value="true">是</span>' +
+                       '<span class="tag-chip active" onclick="selectSingle(this,&quot;symHospital&quot;);toggleHospitalNote(this)" data-value="false">否</span>';
         Router.showActionSheet('记录症状', [
           '<div class="form-group">',
             '<label class="form-label">症状名称</label>',
@@ -993,11 +999,7 @@ function renderSymptomRecord() {
           '</div>',
           '<div class="form-group">',
             '<label class="form-label">严重程度</label>',
-            '<div class="tag-group" id="symSeverity">',
-              '<span class="tag-chip active" onclick="selectSingle(this,\\'symSeverity\\')" data-value="轻度">轻度</span>',
-              '<span class="tag-chip" onclick="selectSingle(this,\\'symSeverity\\')" data-value="中度">中度</span>',
-              '<span class="tag-chip" onclick="selectSingle(this,\\'symSeverity\\')" data-value="重度">重度</span>',
-            '</div>',
+            '<div class="tag-group" id="symSeverity">' + sevHtml + '</div>',
           '</div>',
           '<div class="form-group">',
             '<label class="form-label">症状描述</label>',
@@ -1005,21 +1007,14 @@ function renderSymptomRecord() {
           '</div>',
           '<div class="form-group">',
             '<label class="form-label">是否已就医</label>',
-            '<div class="tag-group" id="symHospital">',
-              '<span class="tag-chip" onclick="selectSingle(this,\\'symHospital\\');toggleHospitalNote(this)" data-value="true">是</span>',
-              '<span class="tag-chip active" onclick="selectSingle(this,\\'symHospital\\');toggleHospitalNote(this)" data-value="false">否</span>',
-            '</div>',
+            '<div class="tag-group" id="symHospital">' + hospHtml + '</div>',
           '</div>',
           '<div class="form-group" id="hospitalNoteGroup" style="display:none;">',
             '<label class="form-label">就医备注（医院及医生建议）</label>',
             '<textarea class="form-textarea" id="symHospitalNote" placeholder="就诊医院、医生建议等..."></textarea>',
           '</div>',
           '<button class="btn-primary" onclick="saveSymptom()">保存记录</button>',
-        ].join(''), (overlay) => {
-          overlay.querySelector('#symHospital').querySelectorAll('.tag-chip').forEach(c => {
-            if (c.dataset.value === 'false') c.classList.add('active');
-          });
-        });
+        ].join(''));
       }
 
       function selectSingle(el, groupId) {
