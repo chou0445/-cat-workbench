@@ -6,6 +6,9 @@ on:
     - cron: '0 0 */7 * *'
   workflow_dispatch: # 支持手动触发
 
+permissions:
+  contents: write
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
@@ -20,15 +23,13 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: |
-          pip install requests
+        run: pip install requests
 
       - name: Run fetch script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
-        run: |
-          python3 scripts/fetch_videos.py
+        run: python3 scripts/fetch_videos.py
 
       - name: Commit updated data
         run: |
