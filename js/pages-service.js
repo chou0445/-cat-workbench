@@ -1049,7 +1049,7 @@ function renderSymptomRecord() {
         if (!s) return;
         var descHTML = s.description ? '<div style="margin-top:8px;padding:10px;background:var(--bg-base);border-radius:8px;font-size:13px;"><strong>描述：</strong>' + s.description + '</div>' : '';
         var hospitalHTML = s.is_hospital ? '<div style="margin-top:8px;padding:10px;background:rgba(168,187,160,0.1);border-radius:8px;font-size:13px;"><strong>已就医：</strong>' + (s.hospital_note || '') + '</div>' : '';
-        var healBtn = s.status === '医治中' ? '<button class="btn-primary mt-12" style="background:#A8BBA0;" onclick="markHealed(\'' + id + '\')">标记为已医治</button>' : '';
+        var healBtn = s.status === '医治中' ? '<button class="btn-primary mt-12" style="background:#A8BBA0;" onclick="markHealed(&apos;' + id + '&apos;)">标记为已医治</button>' : '';
         Router.showActionSheet(s.symptom_name + ' 详情', [
           '<div class="report-stat-row"><span class="rs-label">发生日期</span><span class="rs-value">' + s.occur_date + '</span></div>',
           '<div class="report-stat-row"><span class="rs-label">严重程度</span><span class="rs-value"><span class="status-tag ' + severityLabels[s.severity] + '">' + s.severity + '</span></span></div>',
@@ -1057,7 +1057,7 @@ function renderSymptomRecord() {
           descHTML,
           hospitalHTML,
           healBtn,
-          '<button class="btn-danger mt-8" onclick="deleteSymptom(\'' + id + '\')">删除记录</button>',
+          '<button class="btn-danger mt-8" onclick="deleteSymptom(&apos;' + id + '&apos;)">删除记录</button>',
         ].join(''));
       }
 
