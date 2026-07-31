@@ -1,5 +1,5 @@
 // 猫咪工作台 - Service Worker (PWA)
-const CACHE_NAME = 'cat-workbench-v2';
+const CACHE_NAME = 'cat-workbench-v3';
 const BASE = self.registration ? self.registration.scope : '/';
 
 const ASSETS = [

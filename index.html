@@ -78,7 +78,9 @@
   <script>
     // 注册 Service Worker (PWA)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js', {scope: './'}).catch(function(e) {
+      navigator.serviceWorker.register('sw.js', {scope: '/-cat-workbench/'}).then(function(reg) {
+        console.log('SW registered with scope:', reg.scope);
+      }).catch(function(e) {
         console.warn('SW register failed:', e);
       });
     }
