@@ -37,7 +37,9 @@ function renderHome() {
       <div class="home-header">
         <div class="avatar-wrap" onclick="Router.navigate('catProfile')">
           <div class="avatar">
-            ${cat.avatar_emoji || '🐱'}
+            ${cat.avatar_image 
+              ? `<img src="${cat.avatar_image}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` 
+              : (cat.avatar_emoji || '🐱')}
             <div class="online-dot"></div>
           </div>
           <div>
@@ -1661,13 +1663,20 @@ function renderCatProfile() {
       <div class="content">
         <!-- 头像 -->
         <div style="text-align:center;padding:20px 0;">
-          <div style="width:100px;height:100px;border-radius:50%;background:var(--color-primary-soft);display:inline-flex;align-items:center;justify-content:center;font-size:60px;" id="avatarDisplay">
-            ${cat.avatar_emoji || '🐱'}
+          <div style="position:relative;width:100px;height:100px;margin:0 auto;">
+            <div style="width:100px;height:100px;border-radius:50%;background:var(--color-primary-soft);display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;border:3px solid var(--color-primary);" id="avatarDisplay">
+              ${cat.avatar_image 
+                ? `<img src="${cat.avatar_image}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` 
+                : (cat.avatar_emoji || '🐱')}
+            </div>
+            <div onclick="document.getElementById('avatarFileInput').click()" style="position:absolute;bottom:0;right:0;width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.2);border:2px solid #fff;">📷</div>
+            <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)">
           </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--text-secondary);">点击 📷 从相册上传</div>
           <div style="margin-top:8px;">
             <div class="tag-group" style="justify-content:center;">
               ${['🐱', '😺', '😸', '😻', '🐈', '🐈‍⬛'].map(e => 
-                `<span class="tag-chip ${cat.avatar_emoji === e ? 'active' : ''}" onclick="selectAvatar(this, '${e}')" data-value="${e}">${e}</span>`
+                `<span class="tag-chip ${cat.avatar_emoji === e && !cat.avatar_image ? 'active' : ''}" onclick="selectAvatar(this, '${e}')" data-value="${e}">${e}</span>`
               ).join('')}
             </div>
           </div>
@@ -1723,14 +1732,49 @@ function renderCatProfile() {
     </div>
     <script data-inline>
       let selectedAvatar = '${cat.avatar_emoji || '🐱'}';
+      let avatarImage = ${cat.avatar_image ? `'${cat.avatar_image}'` : 'null'};
       function selectAvatar(el, emoji) {
-        document.querySelectorAll('#avatarDisplay').forEach(a => {});
         document.querySelectorAll('.tag-chip').forEach(c => {
           if (['🐱','😺','😸','😻','🐈','🐈‍⬛'].includes(c.dataset.value)) c.classList.remove('active');
         });
         el.classList.add('active');
         selectedAvatar = emoji;
-        document.getElementById('avatarDisplay').textContent = emoji;
+        avatarImage = null;
+        document.getElementById('avatarDisplay').innerHTML = emoji;
+      }
+      function handleAvatarUpload(input) {
+        var file = input.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          Router.toast('图片不能超过5MB');
+          input.value = '';
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = new Image();
+          img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var maxDim = 256;
+            var w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+              else { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            avatarImage = canvas.toDataURL('image/jpeg', 0.85);
+            document.getElementById('avatarDisplay').innerHTML = '<img src="' + avatarImage + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+            document.querySelectorAll('.tag-chip').forEach(c => {
+              if (['🐱','😺','😸','😻','🐈','🐈‍⬛'].includes(c.dataset.value)) c.classList.remove('active');
+            });
+            Router.toast('头像已选择');
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+        input.value = '';
       }
       function selectSingle(el, groupId) {
         document.querySelectorAll('#' + groupId + ' .tag-chip').forEach(t => t.classList.remove('active'));
@@ -1742,7 +1786,7 @@ function renderCatProfile() {
         const gender = document.querySelector('#genderTags .tag-chip.active');
         const personality = Array.from(document.querySelectorAll('#personalityTags .tag-chip.active')).map(el => el.dataset.value);
 
-        Store.saveCat({
+        var data = {
           name,
           breed: document.getElementById('catBreed').value,
           gender: gender ? gender.dataset.value : '',
@@ -1751,7 +1795,13 @@ function renderCatProfile() {
           personality,
           meal_target: parseInt(document.getElementById('mealTarget').value),
           avatar_emoji: selectedAvatar,
-        });
+        };
+        if (avatarImage) {
+          data.avatar_image = avatarImage;
+        } else {
+          data.avatar_image = null;
+        }
+        Store.saveCat(data);
         Router.toast('保存成功！');
         Router.goBack();
       }
