@@ -155,7 +155,7 @@ const Circle = (function () {
     return [
       '<div class="video-card" onclick="Circle.openVideo(', JSON.stringify(video).replace(/"/g, '&quot;'), ')">',
       '  <div class="video-cover">',
-      '    <img src="', cover, '" alt="', video.title, '" loading="lazy"',
+      '    <img src="', cover, '" alt="', video.title, '" loading="lazy" referrerpolicy="no-referrer"',
       '      onerror="this.style.display=\'none\';this.parentElement.style.background=\'linear-gradient(135deg,#D4977A,#A8BBA0)\';">',
       '    <span class="video-platform" style="background:', platformColor, ';">', platformLabel, '</span>',
       duration ? '<span class="video-duration">' + duration + '</span>' : '',
