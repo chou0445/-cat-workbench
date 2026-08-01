@@ -120,9 +120,6 @@ body {
   overflow-x: hidden;
   overscroll-behavior-y: contain;
   position: relative;
-  /* 关键：阻止WebView的弹性滚动和下拉刷新 */
-  touch-action: pan-y;
-  -webkit-user-drag: none;
 }
 
 /* ============================================

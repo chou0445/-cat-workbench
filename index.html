@@ -14,8 +14,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>猫咪工作台</title>
-  <link rel="stylesheet" href="css/style.css?v=20260801h">
-  <link rel="stylesheet" href="css/components.css?v=20260801h">
+  <link rel="stylesheet" href="css/style.css?v=20260801j">
+  <link rel="stylesheet" href="css/components.css?v=20260801j">
 </head>
 <body>
   <div id="app">
@@ -71,49 +71,30 @@
       window.__jsErrors.push({msg: e.message, file: e.filename, line: e.lineno, col: e.colno});
     });
 
-    // 彻底阻止 WebView/APK 的下拉刷新
-    // 策略：阻止所有从顶部往下拉的手势，除非是内部可滚动区域在中间位置
+    // 阻止 WebView 下拉刷新
+    // 原理：WebView判断 canScrollVertically(-1)，滚动到顶时返回false才触发刷新
+    // 我们在page-container到顶时强制保留1px滚动空间，让WebView始终认为"还能滚"
     (function() {
-      var lastY = 0;
-      document.addEventListener('touchstart', function(e) {
-        lastY = e.touches[0].clientY;
-      }, { passive: true });
-
-      document.addEventListener('touchmove', function(e) {
-        var y = e.touches[0].clientY;
-        var dy = y - lastY;
-        // 找到事件发生的滚动容器
-        var el = e.target;
-        var scrollable = null;
-        while (el && el !== document.body) {
-          var s = window.getComputedStyle(el);
-          var oy = s.overflowY;
-          if (oy === 'auto' || oy === 'scroll') {
-            scrollable = el;
-            break;
-          }
-          el = el.parentElement;
-        }
-        // 如果有滚动容器且不在边界，放行
-        if (scrollable) {
-          var st = scrollable.scrollTop;
-          var sh = scrollable.scrollHeight;
-          var ch = scrollable.clientHeight;
-          if (dy > 0 && st > 0) return; // 往下拉但还没到顶
-          if (dy < 0 && st + ch < sh - 1) return; // 往上拉但还没到底
-        }
-        // 在边界或没有滚动容器：阻止
-        e.preventDefault();
-      }, { passive: false });
+      var pc = document.getElementById('page-container');
+      function fixScroll() {
+        if (!pc) { pc = document.getElementById('page-container'); if (!pc) return; }
+        if (pc.scrollTop <= 0) pc.scrollTop = 1;
+      }
+      // 每次滚动后检查
+      pc.addEventListener('scroll', fixScroll, { passive: true });
+      // touchstart时也检查（防止在顶部开始下拉）
+      pc.addEventListener('touchstart', fixScroll, { passive: true });
+      // 初始检查
+      fixScroll();
     })();
   </script>
-  <script src="js/store.js?v=20260801h"></script>
-  <script src="js/charts.js?v=20260801h"></script>
-  <script src="js/router.js?v=20260801h"></script>
-  <script src="js/pages-home.js?v=20260801h"></script>
-  <script src="js/pages-service.js?v=20260801h"></script>
-  <script src="js/pages-circle.js?v=20260801h"></script>
-  <script src="js/app.js?v=20260801h"></script>
+  <script src="js/store.js?v=20260801j"></script>
+  <script src="js/charts.js?v=20260801j"></script>
+  <script src="js/router.js?v=20260801j"></script>
+  <script src="js/pages-home.js?v=20260801j"></script>
+  <script src="js/pages-service.js?v=20260801j"></script>
+  <script src="js/pages-circle.js?v=20260801j"></script>
+  <script src="js/app.js?v=20260801j"></script>
   <script>
     // 强制清除旧版 Service Worker 缓存
     if ('serviceWorker' in navigator) {
