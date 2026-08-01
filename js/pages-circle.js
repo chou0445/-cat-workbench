@@ -5,7 +5,9 @@
 
 const Circle = (function () {
   const GIST_RAW_URL = 'https://gist.githubusercontent.com/chou0445/0a6c4b9f92ef51a997ecb53f6d5cf04d/raw/videos.json';
+  const GIST_DOUYIN_URL = 'https://gist.githubusercontent.com/chou0445/0a6c4b9f92ef51a997ecb53f6d5cf04d/raw/douyin.json';
   const LOCAL_FALLBACK = 'data/videos.json';
+  const LOCAL_DOUYIN = 'data/douyin.json';
   const PAGE_SIZE = 10;
 
   let allVideos = [];
@@ -29,7 +31,7 @@ const Circle = (function () {
     xhs: '#FF2442',
   };
 
-  // ============ 加载数据 ============
+  // ============ 加载数据（B站 + 抖音合并） ============
   async function loadVideos(force = false) {
     const cache = Store.getCircleCache();
     if (cache && !force && cache.data && cache.data.length > 0) {
@@ -37,31 +39,66 @@ const Circle = (function () {
       return allVideos;
     }
 
+    // 并行加载 B站和抖音数据
+    const [biliResult, douyinResult] = await Promise.allSettled([
+      fetchBilibiliVideos(),
+      fetchDouyinVideos()
+    ]);
+
+    const biliVideos = biliResult.status === 'fulfilled' ? biliResult.value : [];
+    const douyinVideos = douyinResult.status === 'fulfilled' ? douyinResult.value : [];
+
+    // 合并后按 published 倒序排列
+    allVideos = [...biliVideos, ...douyinVideos].sort((a, b) => {
+      const da = a.published ? new Date(a.published).getTime() : 0;
+      const db = b.published ? new Date(b.published).getTime() : 0;
+      return db - da;
+    });
+
+    if (allVideos.length > 0) {
+      Store.saveCircleCache(allVideos);
+    }
+    return allVideos;
+  }
+
+  // ============ 加载 B站数据 ============
+  async function fetchBilibiliVideos() {
     try {
       const response = await fetch(GIST_RAW_URL + '?t=' + Date.now(), { cache: 'no-cache' });
       if (response.ok) {
-        allVideos = await response.json();
-        Store.saveCircleCache(allVideos);
-        return allVideos;
+        return await response.json();
       }
     } catch (e) {
-      console.warn('Gist fetch failed, trying fallback...');
+      console.warn('B站 Gist fetch failed, trying fallback...');
     }
-
-    if (cache && cache.data && cache.data.length > 0) {
-      allVideos = cache.data;
-      return allVideos;
-    }
-
     try {
       const res = await fetch(LOCAL_FALLBACK);
-      allVideos = await res.json();
-      Store.saveCircleCache(allVideos);
-      return allVideos;
+      return await res.json();
     } catch (e2) {
-      allVideos = [];
+      console.warn('B站 local fallback also failed');
       return [];
     }
+  }
+
+  // ============ 加载抖音数据 ============
+  async function fetchDouyinVideos() {
+    try {
+      const response = await fetch(GIST_DOUYIN_URL + '?t=' + Date.now(), { cache: 'no-cache' });
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn('抖音 Gist fetch failed, trying fallback...');
+    }
+    try {
+      const res = await fetch(LOCAL_DOUYIN);
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e2) {
+      console.warn('抖音 local fallback also failed');
+    }
+    return [];
   }
 
   // ============ 排序 ============

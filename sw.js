@@ -1,5 +1,5 @@
 // 猫咪工作台 - Service Worker (PWA)
-const CACHE_NAME = 'cat-workbench-v5';
+const CACHE_NAME = 'cat-workbench-v6';
 const BASE = self.registration ? self.registration.scope : '/';
 
 self.addEventListener('install', event => {
