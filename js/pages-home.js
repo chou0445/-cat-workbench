@@ -47,10 +47,13 @@ function renderHome() {
             <div class="cat-edit-hint">点击编辑档案</div>
           </div>
         </div>
-        <button class="bell-btn" onclick="Router.toast('暂无新消息')">
-          🔔
-          <div class="red-dot"></div>
-        </button>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="bell-btn" onclick="location.reload()" style="background:transparent;border:none;font-size:20px;cursor:pointer;color:#1A1A1A;padding:4px;" title="刷新页面">🔄</button>
+          <button class="bell-btn" onclick="Router.toast('暂无新消息')">
+            🔔
+            <div class="red-dot"></div>
+          </button>
+        </div>
       </div>
 
       <!-- 同心三环 -->

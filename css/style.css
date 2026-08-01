@@ -78,6 +78,13 @@ html, body {
   overscroll-behavior: none;
 }
 
+/* 全局下拉刷新禁用 */
+body {
+  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 #app {
   width: 100%;
   height: 100%;
@@ -89,6 +96,22 @@ html, body {
   margin: 0 auto;
   background: var(--bg-base);
   box-shadow: 0 0 40px rgba(0,0,0,0.08);
+  overscroll-behavior: contain;
+}
+
+/* 顶部固定导航栏 */
+#global-topbar {
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #D4977A;
+  color: #1A1A1A;
+  flex-shrink: 0;
+  z-index: 150;
+  letter-spacing: 0.5px;
+  position: relative;
 }
 
 #page-container {
@@ -96,6 +119,7 @@ html, body {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   position: relative;
 }
 

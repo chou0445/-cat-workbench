@@ -14,11 +14,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>猫咪工作台</title>
-  <link rel="stylesheet" href="css/style.css?v=20260801b">
-  <link rel="stylesheet" href="css/components.css?v=20260801b">
+  <link rel="stylesheet" href="css/style.css?v=20260801f">
+  <link rel="stylesheet" href="css/components.css?v=20260801f">
 </head>
 <body>
   <div id="app">
+    <!-- 顶部固定导航栏（所有页面统一） -->
+    <div id="global-topbar">🐱 小猫工具台</div>
+
     <!-- 页面容器 -->
     <div id="page-container"></div>
 
@@ -68,13 +71,13 @@
       window.__jsErrors.push({msg: e.message, file: e.filename, line: e.lineno, col: e.colno});
     });
   </script>
-  <script src="js/store.js?v=20260801e"></script>
-  <script src="js/charts.js?v=20260801e"></script>
-  <script src="js/router.js?v=20260801e"></script>
-  <script src="js/pages-home.js?v=20260801e"></script>
-  <script src="js/pages-service.js?v=20260801e"></script>
-  <script src="js/pages-circle.js?v=20260801e"></script>
-  <script src="js/app.js?v=20260801e"></script>
+  <script src="js/store.js?v=20260801f"></script>
+  <script src="js/charts.js?v=20260801f"></script>
+  <script src="js/router.js?v=20260801f"></script>
+  <script src="js/pages-home.js?v=20260801f"></script>
+  <script src="js/pages-service.js?v=20260801f"></script>
+  <script src="js/pages-circle.js?v=20260801f"></script>
+  <script src="js/app.js?v=20260801f"></script>
   <script>
     // 强制清除旧版 Service Worker 缓存
     if ('serviceWorker' in navigator) {
