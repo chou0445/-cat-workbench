@@ -14,8 +14,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>猫咪工作台</title>
-  <link rel="stylesheet" href="css/style.css?v=20260801i">
-  <link rel="stylesheet" href="css/components.css?v=20260801i">
+  <link rel="stylesheet" href="css/style.css?v=20260801h">
+  <link rel="stylesheet" href="css/components.css?v=20260801h">
 </head>
 <body>
   <div id="app">
@@ -71,28 +71,49 @@
       window.__jsErrors.push({msg: e.message, file: e.filename, line: e.lineno, col: e.colno});
     });
 
-    // 阻止 Chrome WebView 下拉刷新
-    // 原理：滚动由 body 控制，window.scrollY 能正确反映位置
-    var touchStartY = 0;
-    document.addEventListener('touchstart', function(e) {
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
+    // 彻底阻止 WebView/APK 的下拉刷新
+    // 策略：阻止所有从顶部往下拉的手势，除非是内部可滚动区域在中间位置
+    (function() {
+      var lastY = 0;
+      document.addEventListener('touchstart', function(e) {
+        lastY = e.touches[0].clientY;
+      }, { passive: true });
 
-    document.addEventListener('touchmove', function(e) {
-      var dy = e.touches[0].clientY - touchStartY;
-      // 只有页面在顶部且向下拉时才阻止
-      if (window.scrollY <= 0 && dy > 0) {
+      document.addEventListener('touchmove', function(e) {
+        var y = e.touches[0].clientY;
+        var dy = y - lastY;
+        // 找到事件发生的滚动容器
+        var el = e.target;
+        var scrollable = null;
+        while (el && el !== document.body) {
+          var s = window.getComputedStyle(el);
+          var oy = s.overflowY;
+          if (oy === 'auto' || oy === 'scroll') {
+            scrollable = el;
+            break;
+          }
+          el = el.parentElement;
+        }
+        // 如果有滚动容器且不在边界，放行
+        if (scrollable) {
+          var st = scrollable.scrollTop;
+          var sh = scrollable.scrollHeight;
+          var ch = scrollable.clientHeight;
+          if (dy > 0 && st > 0) return; // 往下拉但还没到顶
+          if (dy < 0 && st + ch < sh - 1) return; // 往上拉但还没到底
+        }
+        // 在边界或没有滚动容器：阻止
         e.preventDefault();
-      }
-    }, { passive: false });
+      }, { passive: false });
+    })();
   </script>
-  <script src="js/store.js?v=20260801i"></script>
-  <script src="js/charts.js?v=20260801i"></script>
-  <script src="js/router.js?v=20260801i"></script>
-  <script src="js/pages-home.js?v=20260801i"></script>
-  <script src="js/pages-service.js?v=20260801i"></script>
-  <script src="js/pages-circle.js?v=20260801i"></script>
-  <script src="js/app.js?v=20260801i"></script>
+  <script src="js/store.js?v=20260801h"></script>
+  <script src="js/charts.js?v=20260801h"></script>
+  <script src="js/router.js?v=20260801h"></script>
+  <script src="js/pages-home.js?v=20260801h"></script>
+  <script src="js/pages-service.js?v=20260801h"></script>
+  <script src="js/pages-circle.js?v=20260801h"></script>
+  <script src="js/app.js?v=20260801h"></script>
   <script>
     // 强制清除旧版 Service Worker 缓存
     if ('serviceWorker' in navigator) {
