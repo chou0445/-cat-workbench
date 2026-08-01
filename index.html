@@ -10,12 +10,12 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="application-name" content="猫咪工作台">
   <meta name="format-detection" content="telephone=no">
-  <link rel="manifest" href="manifest.json?v=20260801b">
+  <link rel="manifest" href="manifest.json?v=20260801m">
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>猫咪工作台</title>
-  <link rel="stylesheet" href="css/style.css?v=20260801k">
-  <link rel="stylesheet" href="css/components.css?v=20260801k">
+  <link rel="stylesheet" href="css/style.css?v=20260801m">
+  <link rel="stylesheet" href="css/components.css?v=20260801m">
 </head>
 <body>
   <div id="app">
@@ -88,49 +88,42 @@
       fixScroll();
     })();
   </script>
-  <script src="js/store.js?v=20260801k"></script>
-  <script src="js/charts.js?v=20260801k"></script>
-  <script src="js/router.js?v=20260801k"></script>
-  <script src="js/pages-home.js?v=20260801k"></script>
-  <script src="js/pages-service.js?v=20260801k"></script>
-  <script src="js/pages-circle.js?v=20260801k"></script>
-  <script src="js/app.js?v=20260801k"></script>
+  <script src="js/store.js?v=20260801m"></script>
+  <script src="js/charts.js?v=20260801m"></script>
+  <script src="js/router.js?v=20260801m"></script>
+  <script src="js/pages-home.js?v=20260801m"></script>
+  <script src="js/pages-service.js?v=20260801m"></script>
+  <script src="js/pages-circle.js?v=20260801m"></script>
+  <script src="js/app.js?v=20260801m"></script>
   <script>
-    // 强制清除旧版 Service Worker 缓存
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(regs) {
-        regs.forEach(function(reg) {
-          reg.active && reg.active.scriptURL.indexOf('sw.js') > -1 && reg.update();
-        });
-      });
-      // 清除所有旧缓存
-      caches.keys().then(function(keys) {
-        keys.forEach(function(k) { caches.delete(k); });
-      });
-    }
-
     // 注册 Service Worker (PWA)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js', {scope: '/-cat-workbench/'}).then(function(reg) {
-        console.log('SW registered with scope:', reg.scope);
-        reg.addEventListener('updatefound', function() {
-          var newWorker = reg.installing;
-          newWorker.addEventListener('statechange', function() {
-            if (newWorker.state === 'activated') {
-              navigator.serviceWorker.controller && window.location.reload();
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js', {scope: '/-cat-workbench/'}).then(function(reg) {
+          console.log('SW registered with scope:', reg.scope);
+          reg.addEventListener('updatefound', function() {
+            var newWorker = reg.installing;
+            if (newWorker) {
+              newWorker.addEventListener('statechange', function() {
+                if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+                  // 新 SW 激活后，静默刷新缓存（不强制 reload）
+                  console.log('SW activated, new content available');
+                }
+              });
             }
           });
+        }).catch(function(e) {
+          console.warn('SW register failed:', e);
         });
-      }).catch(function(e) {
-        console.warn('SW register failed:', e);
       });
     }
 
     // PWA 安装引导
-    let deferredPrompt = null;
+    var deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredPrompt = e;
+      console.log('[PWA] beforeinstallprompt fired, install available');
       // 显示安装按钮
       var btn = document.getElementById('pwa-install-btn');
       if (btn) btn.style.display = 'flex';
@@ -139,18 +132,38 @@
     function pwaInstall() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(function() {
+        deferredPrompt.userChoice.then(function(choice) {
+          console.log('[PWA] user choice:', choice.outcome);
           deferredPrompt = null;
           var btn = document.getElementById('pwa-install-btn');
           if (btn) btn.style.display = 'none';
         });
+      } else {
+        // 没有触发 beforeinstallprompt，提示用户手动安装
+        var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        if (isChrome) {
+          alert('请点击浏览器右上角菜单 ⋮ → 选择「添加到主屏幕」或「安装应用」');
+        } else {
+          alert('请点击浏览器菜单 → 选择「添加到主屏幕」');
+        }
       }
     }
 
     window.addEventListener('appinstalled', function() {
+      console.log('[PWA] installed successfully');
       var btn = document.getElementById('pwa-install-btn');
       if (btn) btn.style.display = 'none';
+      deferredPrompt = null;
     });
+
+    // 检测是否已安装
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+      console.log('[PWA] running in standalone mode');
+      window.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('pwa-install-btn');
+        if (btn) btn.style.display = 'none';
+      });
+    }
   </script>
 </body>
 </html>

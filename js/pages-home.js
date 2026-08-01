@@ -49,6 +49,7 @@ function renderHome() {
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <button class="bell-btn" onclick="location.reload()" style="background:transparent;border:none;font-size:20px;cursor:pointer;color:#1A1A1A;padding:4px;" title="刷新页面">🔄</button>
+          <button id="pwa-install-btn" onclick="pwaInstall()" style="display:none;background:#D4977A;border:none;font-size:14px;color:white;padding:6px 12px;border-radius:20px;cursor:pointer;font-weight:600;">📥 安装</button>
           <button class="bell-btn" onclick="Router.toast('暂无新消息')">
             🔔
             <div class="red-dot"></div>
