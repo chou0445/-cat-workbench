@@ -70,14 +70,32 @@
     window.addEventListener('error', function(e) {
       window.__jsErrors.push({msg: e.message, file: e.filename, line: e.lineno, col: e.colno});
     });
+
+    // 彻底阻止下拉刷新（WebView/PWA 中 overscroll-behavior 可能不够）
+    var startY = 0;
+    document.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 1) startY = e.touches[0].pageY;
+    }, { passive: true });
+    document.addEventListener('touchmove', function(e) {
+      var pc = document.getElementById('page-container');
+      if (!pc) return;
+      var scrollTop = pc.scrollTop;
+      var scrollHeight = pc.scrollHeight;
+      var clientHeight = pc.clientHeight;
+      var deltaY = e.touches[0].pageY - startY;
+      // 在顶部往下拉 或 在底部往上拉 -> 阻止
+      if ((scrollTop <= 0 && deltaY > 0) || (scrollTop + clientHeight >= scrollHeight - 1 && deltaY < 0)) {
+        e.preventDefault();
+      }
+    }, { passive: false });
   </script>
-  <script src="js/store.js?v=20260801f"></script>
-  <script src="js/charts.js?v=20260801f"></script>
-  <script src="js/router.js?v=20260801f"></script>
-  <script src="js/pages-home.js?v=20260801f"></script>
-  <script src="js/pages-service.js?v=20260801f"></script>
-  <script src="js/pages-circle.js?v=20260801f"></script>
-  <script src="js/app.js?v=20260801f"></script>
+  <script src="js/store.js?v=20260801g"></script>
+  <script src="js/charts.js?v=20260801g"></script>
+  <script src="js/router.js?v=20260801g"></script>
+  <script src="js/pages-home.js?v=20260801g"></script>
+  <script src="js/pages-service.js?v=20260801g"></script>
+  <script src="js/pages-circle.js?v=20260801g"></script>
+  <script src="js/app.js?v=20260801g"></script>
   <script>
     // 强制清除旧版 Service Worker 缓存
     if ('serviceWorker' in navigator) {
