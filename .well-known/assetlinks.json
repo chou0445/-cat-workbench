@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.catworkbench.app",
+      "sha256_cert_fingerprints": [
+        "32:A9:86:77:53:2A:E8:EF:AD:22:83:D9:3E:C1:CE:9E:82:B9:E2:27:8D:53:01:F5:8A:D0:8D:7B:4E:E8:E8:CB"
+      ]
+    }
+  }
+]
