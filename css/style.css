@@ -64,10 +64,14 @@
   -webkit-touch-callout: none;
 }
 
-html, body {
+html {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+html, body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
   font-size: 14px;
   color: var(--text-primary);
@@ -82,16 +86,18 @@ html, body {
 body {
   overscroll-behavior: contain;
   overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 #app {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
   max-width: 430px;
   margin: 0 auto;
   background: var(--bg-base);
@@ -111,18 +117,15 @@ body {
   flex-shrink: 0;
   z-index: 150;
   letter-spacing: 0.5px;
-  position: relative;
+  position: sticky;
+  top: 0;
 }
 
 #page-container {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   overscroll-behavior-y: contain;
   position: relative;
-  /* 关键：阻止WebView的弹性滚动和下拉刷新 */
-  touch-action: pan-y;
-  -webkit-user-drag: none;
 }
 
 /* ============================================
@@ -137,6 +140,8 @@ body {
   box-shadow: var(--shadow-tab);
   flex-shrink: 0;
   z-index: 100;
+  position: sticky;
+  bottom: 0;
 }
 
 .tab-item {
