@@ -111,7 +111,7 @@ function renderHome() {
           </div>
           <div class="fc-desc">今日已记录 ${ringData.meal.value} 次</div>
           <div class="fc-chart">${Charts.simpleColorBarChart(poopTrend, (d) => {
-            if (d.status === 'normal') return '#A8BBA0';
+            if (d.status === 'normal') return '#6BBF6B';
             if (d.status === 'warning') return '#D4A86A';
             if (d.status === 'danger') return '#D48A8A';
             return '#EBE6E3';
