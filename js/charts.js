@@ -122,7 +122,7 @@ const Charts = (function () {
     const barW = Math.floor((w - 8) / data.length - 2);
     const bars = data.map((d, i) => {
       const c = colorMap(d);
-      return `<rect x="${4 + i * (barW + 2)}" y="4" width="${barW}" height="${h - 8}" fill="${c}" rx="2" opacity="${i === data.length - 1 ? 1 : 0.7}"/>`;
+      return `<rect x="${4 + i * (barW + 2)}" y="4" width="${barW}" height="${h - 8}" fill="${c}" rx="2" opacity="1"/>`;
     }).join('');
     const firstDate = data[0].date ? data[0].date.slice(5) : '';
     const lastDate = data[data.length - 1].date ? data[data.length - 1].date.slice(5) : '';
