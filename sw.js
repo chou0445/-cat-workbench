@@ -1,5 +1,5 @@
 // 猫咪工作台 - Service Worker (PWA)
-const CACHE_NAME = 'cat-workbench-v8';
+const CACHE_NAME = 'cat-workbench-v9';
 const BASE = self.registration ? self.registration.scope : '/';
 
 // 预缓存的核心资源（安装时立即缓存）

@@ -32,9 +32,16 @@ const Circle = (function () {
   };
 
   // ============ 加载数据（B站 + 抖音合并） ============
+  // 版本号：数据格式变更时递增，强制刷新缓存
+  const DATA_VERSION = 'v2';
+
   async function loadVideos(force = false) {
     const cache = Store.getCircleCache();
-    if (cache && !force && cache.data && cache.data.length > 0) {
+    // 检查缓存版本，旧版本缓存强制刷新
+    const cacheVersion = localStorage.getItem('cat_circle_data_version');
+    const versionMatch = cacheVersion === DATA_VERSION;
+
+    if (cache && !force && versionMatch && cache.data && cache.data.length > 0) {
       allVideos = cache.data;
       return allVideos;
     }
@@ -48,6 +55,8 @@ const Circle = (function () {
     const biliVideos = biliResult.status === 'fulfilled' ? biliResult.value : [];
     const douyinVideos = douyinResult.status === 'fulfilled' ? douyinResult.value : [];
 
+    console.log('[Circle] B站:', biliVideos.length, '抖音:', douyinVideos.length);
+
     // 合并后按 published 倒序排列
     allVideos = [...biliVideos, ...douyinVideos].sort((a, b) => {
       const da = a.published ? new Date(a.published).getTime() : 0;
@@ -57,6 +66,7 @@ const Circle = (function () {
 
     if (allVideos.length > 0) {
       Store.saveCircleCache(allVideos);
+      localStorage.setItem('cat_circle_data_version', DATA_VERSION);
     }
     return allVideos;
   }
@@ -82,23 +92,70 @@ const Circle = (function () {
 
   // ============ 加载抖音数据 ============
   async function fetchDouyinVideos() {
+    let raw = null;
     try {
       const response = await fetch(GIST_DOUYIN_URL + '?t=' + Date.now(), { cache: 'no-cache' });
       if (response.ok) {
-        return await response.json();
+        raw = await response.json();
       }
     } catch (e) {
       console.warn('抖音 Gist fetch failed, trying fallback...');
     }
-    try {
-      const res = await fetch(LOCAL_DOUYIN);
-      if (res.ok) {
-        return await res.json();
+    if (!raw) {
+      try {
+        const res = await fetch(LOCAL_DOUYIN);
+        if (res.ok) {
+          raw = await res.json();
+        }
+      } catch (e2) {
+        console.warn('抖音 local fallback also failed');
       }
-    } catch (e2) {
-      console.warn('抖音 local fallback also failed');
     }
-    return [];
+    if (!raw || !Array.isArray(raw)) return [];
+
+    // 抖音数据字段映射为统一格式
+    return raw.map(v => {
+      // 时长转换：毫秒 → mm:ss
+      var durMs = v.videoMeta && v.videoMeta.duration;
+      var durStr = '';
+      if (durMs && durMs > 0) {
+        var sec = Math.floor(durMs / 1000);
+        durStr = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+      }
+
+      // 点赞数格式化
+      var digg = v.statistics && v.statistics.diggCount || 0;
+      var viewsStr = '';
+      if (digg > 0) {
+        if (digg >= 100000000) viewsStr = (digg / 100000000).toFixed(1) + '亿赞';
+        else if (digg >= 10000) viewsStr = (digg / 10000).toFixed(1) + '万赞';
+        else viewsStr = digg + '赞';
+      }
+
+      // 从 hashtags 推断分类
+      var category = '新手必看';
+      var hashtags = (v.hashtags || []).map(h => h.name || h);
+      var hashStr = hashtags.join('');
+      if (hashStr.includes('健康') || hashStr.includes('绝育') || hashStr.includes('驱虫') || hashStr.includes('疫苗')) category = '健康养护';
+      else if (hashStr.includes('行为') || hashStr.includes('叫') || hashStr.includes('社会化')) category = '行为解读';
+      else if (hashStr.includes('猫粮') || hashStr.includes('饮食') || hashStr.includes('营养')) category = '营养饮食';
+      else if (hashStr.includes('急救') || hashStr.includes('猫瘟') || hashStr.includes('呕吐')) category = '急救知识';
+      else if (hashStr.includes('品种') || hashStr.includes('布偶') || hashStr.includes('英短')) category = '品种科普';
+      else if (hashStr.includes('新手') || hashStr.includes('必看')) category = '新手必看';
+
+      return {
+        id: 'dy_' + v.id,
+        title: (v.text || v.previewTitle || v.caption || '未知视频').replace(/#[^#]+/g, '').trim(),
+        platform: 'douyin',
+        category: category,
+        cover: (v.videoMeta && v.videoMeta.cover) || '',
+        duration: durStr,
+        views: viewsStr,
+        published: v.createDate || '',
+        web_url: v.url || '',
+        app_scheme: 'snssdk1128://aweme/detail/' + v.id
+      };
+    });
   }
 
   // ============ 排序 ============
@@ -270,6 +327,12 @@ function renderCircle() {
     '  window.circleSort = "default";',
     '',
     '  async function loadCircleData(force) {',
+    '    // 检查缓存是否超过1小时，自动刷新',
+    '    var cache = Store.getCircleCache();',
+    '    if (!force && cache && cache.cached_at) {',
+    '      var age = Date.now() - new Date(cache.cached_at).getTime();',
+    '      if (age > 3600000) { force = true; }',
+    '    }',
     '    const videos = await Circle.loadVideos(force);',
     '    renderVideoList();',
     '  }',
@@ -356,15 +419,23 @@ function renderCircleSearch() {
     Circle.hotKeywords.map(k => '<span class="tag-chip" onclick="quickSearch(\'' + k + '\')">' + k + '</span>').join(''),
     '      </div>',
     '    </div>',
-    '    <div id="searchResults"></div>',
+    '    <div id="searchResults">',
+    '      <div id="searchLoading" style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">正在加载视频数据...</div>',
+    '    </div>',
     '  </div>',
     '</div>',
     '<script data-inline>',
+    '  let _searchReady = false;',
+    '',
     '  async function initSearch() {',
     '    await Circle.loadVideos();',
+    '    _searchReady = true;',
+    '    var loading = document.getElementById("searchLoading");',
+    '    if (loading) loading.style.display = "none";',
     '  }',
     '',
     '  function searchVideos(keyword) {',
+    '    if (!_searchReady) { return; }',
     '    const kw = keyword.trim();',
     '    const hotSearch = document.getElementById("hotSearch");',
     '    const results = document.getElementById("searchResults");',
