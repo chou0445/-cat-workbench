@@ -27,7 +27,7 @@ jobs:
 
       - name: Run fetch script
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIST_TOKEN }}
           GIST_ID: ${{ secrets.GIST_ID }}
         run: python3 scripts/fetch_videos.py
 
