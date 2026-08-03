@@ -113,17 +113,20 @@ const Circle = (function () {
     }
     if (!raw || !Array.isArray(raw)) return [];
 
-    // 抖音数据字段映射为统一格式
+    // 检测数据格式：如果已有统一字段(title/platform)，直接返回
+    // 否则是原始抖音格式，需要字段映射
+    if (raw.length > 0 && raw[0].title && raw[0].platform) {
+      return raw;
+    }
+
+    // 原始抖音数据字段映射
     return raw.map(v => {
-      // 时长转换：毫秒 → mm:ss
       var durMs = v.videoMeta && v.videoMeta.duration;
       var durStr = '';
       if (durMs && durMs > 0) {
         var sec = Math.floor(durMs / 1000);
         durStr = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
       }
-
-      // 点赞数格式化
       var digg = v.statistics && v.statistics.diggCount || 0;
       var viewsStr = '';
       if (digg > 0) {
@@ -131,8 +134,6 @@ const Circle = (function () {
         else if (digg >= 10000) viewsStr = (digg / 10000).toFixed(1) + '万赞';
         else viewsStr = digg + '赞';
       }
-
-      // 从 hashtags 推断分类
       var category = '新手必看';
       var hashtags = (v.hashtags || []).map(h => h.name || h);
       var hashStr = hashtags.join('');
@@ -141,7 +142,6 @@ const Circle = (function () {
       else if (hashStr.includes('猫粮') || hashStr.includes('饮食') || hashStr.includes('营养')) category = '营养饮食';
       else if (hashStr.includes('急救') || hashStr.includes('猫瘟') || hashStr.includes('呕吐')) category = '急救知识';
       else if (hashStr.includes('品种') || hashStr.includes('布偶') || hashStr.includes('英短')) category = '品种科普';
-      else if (hashStr.includes('新手') || hashStr.includes('必看')) category = '新手必看';
 
       return {
         id: 'dy_' + v.id,
