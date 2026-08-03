@@ -35,6 +35,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/videos.json
-          git diff --staged --quiet || git commit -m "chore: 自动更新猫圈视频数据"
+          git add data/videos.json data/douyin.json
+          git diff --staged --quiet || git commit -m "chore: 自动更新猫圈视频数据（B站+抖音）"
           git push

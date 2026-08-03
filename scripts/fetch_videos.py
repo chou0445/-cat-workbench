@@ -12,7 +12,9 @@ from datetime import datetime
 GIST_ID = os.environ.get("GIST_ID", "0a6c4b9f92ef51a997ecb53f6d5cf04d")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 GIST_FILENAME = "videos.json"
+GIST_DOUYIN_FILENAME = "douyin.json"
 OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "videos.json")
+OUTPUT_DOUYIN_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "douyin.json")
 
 # B站搜索关键词 + 每关键词抓取的页数
 BILI_KEYWORDS = [
@@ -229,6 +231,8 @@ def fetch_all():
     print("\n" + "=" * 50)
     print("🌱 种子链接解析")
     print("=" * 50)
+    douyin_videos = []
+    xhs_videos = []
     for url, title, platform, category in SEEDS:
         vid = f"{platform}_{hash(title) & 0xFFFFFFFF}"
         if vid in seen_ids: continue
@@ -243,6 +247,9 @@ def fetch_all():
             m = re.search(r'/video/(\d+)', url)
             if m:
                 item["app_scheme"] = f"snssdk1128://aweme/detail/{m.group(1)}"
+            douyin_videos.append(item)
+        elif platform == "xhs":
+            xhs_videos.append(item)
         
         all_videos.append(item)
         time.sleep(0.5)
@@ -253,42 +260,54 @@ def fetch_all():
         labels = {"bilibili": "B站", "douyin": "抖音", "xhs": "小红书"}
         print(f"   {labels.get(p, p)}: {c} 条")
 
-    # 保存本地
+    # 保存B站数据到 videos.json
+    bili_videos = [v for v in all_videos if v["platform"] == "bilibili"]
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(all_videos, f, ensure_ascii=False, indent=2)
-    print(f"\n💾 已保存: {OUTPUT_FILE}")
-    return all_videos
+        json.dump(bili_videos, f, ensure_ascii=False, indent=2)
+    print(f"\n💾 B站数据已保存: {OUTPUT_FILE} ({len(bili_videos)}条)")
+
+    # 保存抖音数据到 douyin.json
+    with open(OUTPUT_DOUYIN_FILE, "w", encoding="utf-8") as f:
+        json.dump(douyin_videos, f, ensure_ascii=False, indent=2)
+    print(f"💾 抖音数据已保存: {OUTPUT_DOUYIN_FILE} ({len(douyin_videos)}条)")
+
+    return bili_videos, douyin_videos
 
 # ============ Gist ============
-def update_gist(videos):
+def update_gist(bili_videos, douyin_videos):
     if not GIST_ID or not GITHUB_TOKEN:
         print("⚠️ 未配置 GIST_ID/GITHUB_TOKEN")
         return None
-    
-    content = json.dumps(videos, ensure_ascii=False, indent=2)
+
+    bili_content = json.dumps(bili_videos, ensure_ascii=False, indent=2)
+    douyin_content = json.dumps(douyin_videos, ensure_ascii=False, indent=2)
     url = f"https://api.github.com/gists/{GIST_ID}"
-    payload = json.dumps({"files": {GIST_FILENAME: {"content": content}}}).encode()
-    
+    payload = json.dumps({"files": {
+        GIST_FILENAME: {"content": bili_content},
+        GIST_DOUYIN_FILENAME: {"content": douyin_content},
+    }}).encode()
+
     req = urllib.request.Request(url, data=payload, headers={
         "Authorization": f"Bearer {GITHUB_TOKEN}",
         "Accept": "application/vnd.github+json",
         "User-Agent": "cat-workbench/1.0",
     }, method="PATCH")
-    
+
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             d = json.loads(r.read())
-        raw_url = d["files"][GIST_FILENAME]["raw_url"]
         print(f"✅ Gist 已更新: {d['html_url']}")
-        print(f"📎 Raw: {raw_url}")
-        return raw_url
+        for fname in [GIST_FILENAME, GIST_DOUYIN_FILENAME]:
+            if fname in d.get("files", {}):
+                print(f"   📎 {fname}: {d['files'][fname]['raw_url']}")
+        return d
     except Exception as e:
         print(f"❌ Gist 失败: {e}")
         return None
 
 if __name__ == "__main__":
     print("🐱 猫咪视频抓取脚本")
-    videos = fetch_all()
+    bili_videos, douyin_videos = fetch_all()
     if GIST_ID and GITHUB_TOKEN:
         print("\n📤 推送 Gist...")
-        update_gist(videos)
+        update_gist(bili_videos, douyin_videos)
