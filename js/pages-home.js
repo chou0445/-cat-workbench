@@ -18,9 +18,11 @@ function renderHome() {
   const weightTrend = Store.getWeightTrend7d();
   const waterTrend = Store.getWaterTrend7d();
 
-  // 驱虫状态
-  const ext = deworming.external;
-  const extRemain = ext ? ext.remain : null;
+  // 驱虫状态（取体内/体外剩余天数更少者展示）
+  const dwInt = deworming.internal;
+  const dwExt = deworming.external;
+  const intRemain = dwInt ? dwInt.remain : null;
+  const extRemain = dwExt ? dwExt.remain : null;
 
   // 睡眠今日
   const todaySleep = Store.getAll('sleeps').find(s => s.record_date === Store.todayStr());
@@ -122,8 +124,21 @@ function renderHome() {
             <span class="fc-icon">💊</span>
             <span class="fc-title">驱虫提醒</span>
           </div>
-          <div class="fc-desc">${ext && extRemain !== null ? (extRemain < 0 ? '已过期' : '体外驱虫剩 ' + extRemain + ' 天') : '未设置'}</div>
-          <div class="fc-chart">${ext && extRemain !== null ? Charts.simpleProgressBar(Math.abs(extRemain), 30, extRemain < 0 ? '#D48A8A' : '#E8835A', extRemain < 0 ? '过期' : extRemain + '天') : '<div class="fc-arrow">→</div>'}</div>
+          ${(() => {
+            // 取体内/体外剩余天数更少者展示（未设置的跳过）
+            const cand = [];
+            if (dwInt && intRemain !== null) cand.push({ type: '体内驱虫', remain: intRemain, total: 90 });
+            if (dwExt && extRemain !== null) cand.push({ type: '体外驱虫', remain: extRemain, total: 30 });
+            if (cand.length === 0) {
+              return `<div class="fc-desc">未设置</div><div class="fc-chart"><div class="fc-arrow">→</div></div>`;
+            }
+            // 剩余天数更少（含过期更负）的优先
+            const pick = cand.reduce((a, b) => (a.remain <= b.remain ? a : b));
+            const descText = pick.remain < 0 ? '已过期' : pick.type + '剩 ' + pick.remain + ' 天';
+            const labelText = pick.remain < 0 ? pick.type + '已过期' : pick.type + '剩余' + pick.remain + '天';
+            return `<div class="fc-desc">${descText}</div>
+                    <div class="fc-chart">${Charts.miniRingProgress(pick.remain, pick.total, labelText)}</div>`;
+          })()}
         </div>
 
         <!-- 第3行 右：睡眠记录 -->
@@ -201,7 +216,7 @@ function renderHome() {
         </div>
         <div class="info-card bg-warn">
           <span class="info-icon">💊</span>
-          <span class="info-text">${ext && extRemain !== null ? (extRemain < 0 ? '体外驱虫已过期' : '体外驱虫还剩' + extRemain + '天到期') : '请设置驱虫提醒'}</span>
+          <span class="info-text">${dwExt && extRemain !== null ? (extRemain < 0 ? '体外驱虫已过期' : '体外驱虫还剩' + extRemain + '天到期') : '请设置驱虫提醒'}</span>
         </div>
       </div>
     </div>
