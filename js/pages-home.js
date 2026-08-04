@@ -33,6 +33,36 @@ function renderHome() {
   // 用餐今日
   const mealsToday = Store.getAll('meals').filter(m => Store.formatDate(m.meal_time) === Store.todayStr());
 
+  // 排便今日
+  const poopsToday = Store.getAll('poops').filter(p => Store.formatDate(p.record_time) === Store.todayStr());
+
+  // 用药提醒（今日动态用）
+  const todayStr = Store.todayStr();
+  const activeMeds = Store.getAll('medications').filter(m => m.is_active);
+  const medsToday = activeMeds.filter(m => {
+    if (!m.start_date) return false;
+    const startOk = m.start_date <= todayStr;
+    const endOk = !m.end_date || m.end_date >= todayStr;
+    return startOk && endOk;
+  });
+  const medsRunningOut = activeMeds.filter(m => {
+    if (!m.end_date) return false;
+    const remain = Math.floor((new Date(m.end_date) - new Date(todayStr)) / (1000 * 60 * 60 * 24));
+    return remain >= 0 && remain <= 3;
+  });
+  const medCheckedToday = localStorage.getItem('med_checked_' + todayStr) === '1';
+  // 用药提醒横幅内容（优先级：快用完 > 该吃 > 已记录）
+  let medInfoHTML = '';
+  if (medsRunningOut.length > 0) {
+    medInfoHTML = `<div class="info-card bg-warn"><span class="info-icon">⚠️</span><span class="info-text">${medsRunningOut[0].drug_name} 快用完了，记得备药</span></div>`;
+  } else if (medsToday.length === 1) {
+    medInfoHTML = `<div class="info-card bg-warn"><span class="info-icon">💊</span><span class="info-text">今天该吃 ${medsToday[0].drug_name} 了</span></div>`;
+  } else if (medsToday.length >= 2) {
+    medInfoHTML = `<div class="info-card bg-warn"><span class="info-icon">💊</span><span class="info-text">今天有 ${medsToday.length} 种药需要吃</span></div>`;
+  } else if (medCheckedToday && activeMeds.length > 0) {
+    medInfoHTML = `<div class="info-card bg-success"><span class="info-icon">✅</span><span class="info-text">今日用药已记录</span></div>`;
+  }
+
   return `
     <div class="page">
       <!-- Header -->
@@ -109,7 +139,7 @@ function renderHome() {
             <span class="fc-icon">💩</span>
             <span class="fc-title">排便打卡</span>
           </div>
-          <div class="fc-desc">今日已记录 ${ringData.meal.value} 次</div>
+          <div class="fc-desc">今日已记录 ${poopsToday.length} 次</div>
           <div class="fc-chart">${Charts.simpleColorBarChart(poopTrend, (d) => {
             if (d.status === 'normal') return '#6BBF6B';
             if (d.status === 'warning') return '#D4A86A';
@@ -124,21 +154,18 @@ function renderHome() {
             <span class="fc-icon">💊</span>
             <span class="fc-title">驱虫提醒</span>
           </div>
-          ${(() => {
-            // 取体内/体外剩余天数更少者展示（未设置的跳过）
-            const cand = [];
-            if (dwInt && intRemain !== null) cand.push({ type: '体内驱虫', remain: intRemain, total: 90 });
-            if (dwExt && extRemain !== null) cand.push({ type: '体外驱虫', remain: extRemain, total: 30 });
-            if (cand.length === 0) {
-              return `<div class="fc-desc">未设置</div><div class="fc-chart"><div class="fc-arrow">→</div></div>`;
-            }
-            // 剩余天数更少（含过期更负）的优先
-            const pick = cand.reduce((a, b) => (a.remain <= b.remain ? a : b));
-            const descText = pick.remain < 0 ? '已过期' : pick.type + '剩 ' + pick.remain + ' 天';
-            const labelText = pick.remain < 0 ? pick.type + '已过期' : pick.type + '剩余' + pick.remain + '天';
-            return `<div class="fc-desc">${descText}</div>
-                    <div class="fc-chart">${Charts.miniRingProgress(pick.remain, pick.total, labelText)}</div>`;
-          })()}
+          <div class="fc-chart" style="align-items:center;justify-content:center;">
+            ${(() => {
+              // 取体内/体外剩余天数更少者展示（未设置的跳过）
+              const cand = [];
+              if (dwInt && intRemain !== null) cand.push({ remain: intRemain, total: 90 });
+              if (dwExt && extRemain !== null) cand.push({ remain: extRemain, total: 30 });
+              if (cand.length === 0) return '<div class="fc-arrow" style="font-size:24px;">→</div>';
+              // 剩余天数更少（含过期更负）的优先
+              const pick = cand.reduce((a, b) => (a.remain <= b.remain ? a : b));
+              return Charts.featureCountdownRing(Math.abs(pick.remain), pick.total, pick.remain < 0 ? 'expired' : 'normal', '#F5C842');
+            })()}
+          </div>
         </div>
 
         <!-- 第3行 右：睡眠记录 -->
@@ -206,6 +233,7 @@ function renderHome() {
       <!-- 动态信息流 -->
       <div class="section-title" style="padding-left:16px;">今日动态</div>
       <div class="info-flow">
+        ${medInfoHTML}
         <div class="info-card bg-sleep">
           <span class="info-icon">😴</span>
           <span class="info-text">${cat.name || '小橘'}昨晚睡了 ${sleepStats.avgHours}h，${todaySleep && todaySleep.quality === '安稳' ? '质量安稳' : '质量一般'}</span>
@@ -345,12 +373,12 @@ function renderMealCheckin() {
           });
         });
         Router.toast('打卡成功！');
-        Router.navigate('mealCheckin');
+        Router.refresh();
       }
       function deleteMeal(id) {
         Router.confirm('确定删除这条用餐记录？', () => {
           Store.remove('meals', id);
-          Router.navigate('mealCheckin');
+          Router.refresh();
         });
       }
     </script>
@@ -569,13 +597,13 @@ function renderPoopCheckin() {
           });
         });
         Router.toast('打卡成功！');
-        Router.navigate('poopCheckin');
+        Router.refresh();
       }
 
       function deletePoop(id) {
         Router.confirm('确定删除这条排便记录？', () => {
           Store.remove('poops', id);
-          Router.navigate('poopCheckin');
+          Router.refresh();
         });
       }
     </script>
@@ -751,12 +779,12 @@ function renderWaterCheckin() {
           });
         });
         Router.toast('打卡成功！');
-        Router.navigate('waterCheckin');
+        Router.refresh();
       }
       function deleteWater(id) {
         Router.confirm('确定删除这条饮水记录？', () => {
           Store.remove('waters', id);
-          Router.navigate('waterCheckin');
+          Router.refresh();
         });
       }
     </script>
@@ -955,13 +983,13 @@ function renderInteractCheckin() {
           });
         });
         Router.toast('打卡成功！');
-        Router.navigate('interactCheckin');
+        Router.refresh();
       }
 
       function deleteInteract(id) {
         Router.confirm('确定删除这条互动记录？', () => {
           Store.remove('interactions', id);
-          Router.navigate('interactCheckin');
+          Router.refresh();
         });
       }
     </script>
@@ -1107,12 +1135,12 @@ function renderWeightRecord() {
         });
         Router.closeActionSheet();
         Router.toast('记录成功！');
-        Router.navigate('weightRecord');
+        Router.refresh();
       }
       function deleteWeight(id) {
         Router.confirm('确定删除这条体重记录？', () => {
           Store.remove('weights', id);
-          Router.navigate('weightRecord');
+          Router.refresh();
         });
       }
     </script>
@@ -1220,12 +1248,12 @@ function renderDewormManage() {
         });
         Router.closeActionSheet();
         Router.toast('保存成功！');
-        Router.navigate('dewormManage');
+        Router.refresh();
       }
       function deleteDeworming(id) {
         Router.confirm('确定删除这条驱虫记录？', () => {
           Store.remove('dewormings', id);
-          Router.navigate('dewormManage');
+          Router.refresh();
         });
       }
     </script>
@@ -1446,7 +1474,7 @@ function renderSleepRecord() {
           });
         }
         Router.toast('保存成功！');
-        Router.navigate('sleepRecord');
+        Router.refresh();
       }
       function editSleep(id) {
         Router.navigate('sleepHistory');
@@ -1454,7 +1482,7 @@ function renderSleepRecord() {
       function deleteSleep(id) {
         Router.confirm('确定删除这条睡眠记录？', () => {
           Store.remove('sleeps', id);
-          Router.navigate('sleepRecord');
+          Router.refresh();
         });
       }
     </script>
@@ -1522,7 +1550,7 @@ function renderSleepHistory() {
       function deleteSleepHist(id) {
         Router.confirm('确定删除这条睡眠记录？', () => {
           Store.remove('sleeps', id);
-          Router.navigate('sleepHistory');
+          Router.refresh();
         });
       }
     </script>

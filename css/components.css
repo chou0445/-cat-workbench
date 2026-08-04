@@ -399,6 +399,7 @@
 .info-card.bg-meal { background: rgba(212,151,122,0.08); }
 .info-card.bg-sleep { background: rgba(168,187,160,0.08); }
 .info-card.bg-warn { background: rgba(212,168,106,0.08); }
+.info-card.bg-success { background: rgba(107,191,107,0.08); }
 
 /* ============================================
    服务列表

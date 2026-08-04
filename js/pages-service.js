@@ -152,7 +152,7 @@ function renderVaccineBook() {
         });
         Router.closeActionSheet();
         Router.toast('保存成功！');
-        Router.navigate('vaccineBook');
+        Router.refresh();
       }
       function editVaccine(id) {
         const v = Store.getById('vaccines', id);
@@ -192,13 +192,13 @@ function renderVaccineBook() {
         });
         Router.closeActionSheet();
         Router.toast('更新成功！');
-        Router.navigate('vaccineBook');
+        Router.refresh();
       }
       function deleteVaccine(id) {
         Router.closeActionSheet();
         Router.confirm('确定删除这条疫苗记录？', () => {
           Store.remove('vaccines', id);
-          Router.navigate('vaccineBook');
+          Router.refresh();
         });
       }
     </script>
@@ -207,6 +207,8 @@ function renderVaccineBook() {
 
 // ============ 用药提醒 ============
 function renderMedicationRemind() {
+  // 标记今日已查看用药提醒（首页"今日已记录用药"用）
+  try { localStorage.setItem('med_checked_' + Store.todayStr(), '1'); } catch(e) {}
   const meds = Store.getAll('medications').sort((a, b) => new Date(b.start_date) - new Date(a.start_date));
   const active = meds.filter(m => m.is_active);
   const inactive = meds.filter(m => !m.is_active);
@@ -326,11 +328,11 @@ function renderMedicationRemind() {
         });
         Router.closeActionSheet();
         Router.toast('保存成功！');
-        Router.navigate('medicationRemind');
+        Router.refresh();
       }
       function toggleMedActive(id, active) {
         Store.update('medications', id, { is_active: active });
-        Router.navigate('medicationRemind');
+        Router.refresh();
       }
       function editMedication(id) {
         const m = Store.getById('medications', id);
@@ -365,13 +367,13 @@ function renderMedicationRemind() {
         });
         Router.closeActionSheet();
         Router.toast('更新成功！');
-        Router.navigate('medicationRemind');
+        Router.refresh();
       }
       function deleteMedication(id) {
         Router.closeActionSheet();
         Router.confirm('确定删除这条用药记录？', () => {
           Store.remove('medications', id);
-          Router.navigate('medicationRemind');
+          Router.refresh();
         });
       }
     </script>
@@ -453,7 +455,7 @@ function renderExamRecord() {
         });
         Router.closeActionSheet();
         Router.toast('保存成功！');
-        Router.navigate('examRecord');
+        Router.refresh();
       }
       function viewExam(id) {
         const e = Store.getById('exams', id);
@@ -479,7 +481,7 @@ function renderExamRecord() {
         Router.closeActionSheet();
         Router.confirm('确定删除这条体检记录？', () => {
           Store.remove('exams', id);
-          Router.navigate('examRecord');
+          Router.refresh();
         });
       }
     </script>
@@ -599,7 +601,7 @@ function renderBasicInfo() {
           source: document.getElementById('editSource').value,
         });
         Router.toast('保存成功！');
-        Router.navigate('basicInfo');
+        Router.refresh();
       }
     </script>
   `;
@@ -664,7 +666,7 @@ function renderMedicalRecord() {
         });
         Router.closeActionSheet();
         Router.toast('保存成功！');
-        Router.navigate('medicalRecord');
+        Router.refresh();
       }
       function viewRecord(id) {
         const r = Store.getById('records', id);
@@ -682,7 +684,7 @@ function renderMedicalRecord() {
         Router.closeActionSheet();
         Router.confirm('确定删除这条病历记录？', () => {
           Store.remove('records', id);
-          Router.navigate('medicalRecord');
+          Router.refresh();
         });
       }
     </script>
@@ -744,7 +746,7 @@ function renderImmunizationProof() {
         });
         Router.closeActionSheet();
         Router.toast('保存成功！');
-        Router.navigate('immunizationProof');
+        Router.refresh();
       }
       function viewProof(id) {
         const p = Store.getById('immunizations', id);
@@ -760,7 +762,7 @@ function renderImmunizationProof() {
         Router.closeActionSheet();
         Router.confirm('确定删除这条免疫证明？', () => {
           Store.remove('immunizations', id);
-          Router.navigate('immunizationProof');
+          Router.refresh();
         });
       }
     </script>
@@ -1041,7 +1043,7 @@ function renderSymptomRecord() {
         });
         Router.closeActionSheet();
         Router.toast('记录成功！');
-        Router.navigate('symptomRecord');
+        Router.refresh();
       }
 
       function viewSymptom(id) {
@@ -1083,7 +1085,7 @@ function renderSymptomRecord() {
             });
           }
           Router.toast('已标记为已医治，病历已自动生成');
-          Router.navigate('symptomRecord');
+          Router.refresh();
         });
       }
 
@@ -1091,7 +1093,7 @@ function renderSymptomRecord() {
         Router.closeActionSheet();
         Router.confirm('确定删除这条症状记录？', () => {
           Store.remove('symptoms', id);
-          Router.navigate('symptomRecord');
+          Router.refresh();
         });
       }
     </script>
