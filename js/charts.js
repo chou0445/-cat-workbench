@@ -155,39 +155,6 @@ const Charts = (function () {
     `;
   }
 
-  // 迷你环形进度（用于驱虫提醒卡片缩略图）
-  // remain: 剩余天数; total: 总周期; label: 环下方完整文字（如"体外驱虫剩余31天"）
-  function miniRingProgress(remain, total, label) {
-    const size = 38;           // 圆环外径
-    const stroke = 4;          // 环宽
-    const r = (size - stroke) / 2;
-    const cx = size / 2;
-    const cy = size / 2;
-    const circumference = 2 * Math.PI * r;
-    // 进度比例 = 已过去天数 / 总周期（剩余越少，进度环越满）
-    const elapsed = Math.max(0, total - remain);
-    const ratio = Math.max(0, Math.min(1, elapsed / total));
-    const dashOffset = circumference * (1 - ratio);
-    // 环内显示数字（剩余天数，过期显示负数的绝对值并标记）
-    const numText = remain < 0 ? String(Math.abs(remain)) : String(remain);
-
-    return `
-      <div class="mini-ring-wrap" style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:100%;">
-        <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" style="display:block;">
-          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E8E0D8" stroke-width="${stroke}"/>
-          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#D4977A" stroke-width="${stroke}"
-                  stroke-linecap="round"
-                  stroke-dasharray="${circumference}"
-                  stroke-dashoffset="${dashOffset}"
-                  transform="rotate(-90 ${cx} ${cy})"/>
-          <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central"
-                font-size="13" font-weight="700" fill="#3D3A39">${numText}</text>
-        </svg>
-        <div style="font-size:11px;color:#A8A09C;margin-top:4px;line-height:1.2;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${label}</div>
-      </div>
-    `;
-  }
-
   // 带端点值的折线图
   function simpleLineWithValues(data, valueKey, color, size = {}) {
     const w = size.width || 110;
@@ -322,6 +289,30 @@ const Charts = (function () {
         </svg>
         <span class="countdown-text" style="color:${color};">${status === 'expired' ? '过期' : remain + 'd'}</span>
       </div>
+    `;
+  }
+
+  // feature-card 用的倒计时环（较大、环宽加粗、无下方文字）
+  function featureCountdownRing(remain, total, status, color) {
+    const c = color || '#F5C842';
+    const percent = status === 'expired' ? 1 : Math.max(0, Math.min(1, 1 - remain / total));
+    const size = 60;
+    const r = 24;
+    const cx = size / 2;
+    const cy = size / 2;
+    const circumference = 2 * Math.PI * r;
+    const offset = circumference * (1 - percent);
+
+    return `
+      <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-opacity="0.15" stroke-width="6"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"
+          stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+          transform="rotate(-90 ${cx} ${cy})"
+          style="transition: stroke-dashoffset 0.8s ease;"/>
+        <text x="${cx}" y="${cy - 2}" text-anchor="middle" font-size="13" font-weight="700" fill="${c}">${status === 'expired' ? '过期' : remain}</text>
+        <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="8" fill="#A8A09C">${status === 'expired' ? '' : '天'}</text>
+      </svg>
     `;
   }
 
@@ -649,7 +640,7 @@ const Charts = (function () {
     // 新同心环
     nestedRings, ringDataCards,
     // 极简图表
-    simpleBarChart, simpleLineChart, simpleColorBarChart, simpleProgressBar, simpleLineWithValues, miniRingProgress,
+    simpleBarChart, simpleLineChart, simpleColorBarChart, simpleProgressBar, simpleLineWithValues,
     // 详情页组合图表
     dietDetailChart, vitalityDetailChart, healthDetailChart,
     // 保留旧接口（保持向后兼容）
@@ -666,7 +657,7 @@ const Charts = (function () {
       return '<svg viewBox="0 0 80 12" width="80" height="12" style="transform: scaleY(-1);"><path d="M 6,6 A 34,34 0 0 1 74,6" fill="none" stroke="' + color + '" stroke-width="6" stroke-linecap="round" opacity="0.3"/></svg>';
     },
     miniBarChart, miniDotChart, miniLineChart,
-    miniCountdownRing, miniSleepBar, miniEnergyRing,
+    miniCountdownRing, featureCountdownRing, miniSleepBar, miniEnergyRing,
     lineChart, scoreBar, progressBar,
   };
 })();
