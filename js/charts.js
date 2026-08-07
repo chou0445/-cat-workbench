@@ -292,30 +292,6 @@ const Charts = (function () {
     `;
   }
 
-  // feature-card 用的倒计时环（较大、环宽加粗、无下方文字）
-  function featureCountdownRing(remain, total, status, color) {
-    const c = color || '#F5C842';
-    const percent = status === 'expired' ? 1 : Math.max(0, Math.min(1, 1 - remain / total));
-    const size = 60;
-    const r = 24;
-    const cx = size / 2;
-    const cy = size / 2;
-    const circumference = 2 * Math.PI * r;
-    const offset = circumference * (1 - percent);
-
-    return `
-      <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-opacity="0.15" stroke-width="6"/>
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"
-          stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
-          transform="rotate(-90 ${cx} ${cy})"
-          style="transition: stroke-dashoffset 0.8s ease;"/>
-        <text x="${cx}" y="${cy - 2}" text-anchor="middle" font-size="13" font-weight="700" fill="${c}">${status === 'expired' ? '过期' : remain}</text>
-        <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="8" fill="#A8A09C">${status === 'expired' ? '' : '天'}</text>
-      </svg>
-    `;
-  }
-
   // 迷你睡眠条
   function miniSleepBar(durationMinutes) {
     const hours = durationMinutes / 60;
@@ -657,7 +633,7 @@ const Charts = (function () {
       return '<svg viewBox="0 0 80 12" width="80" height="12" style="transform: scaleY(-1);"><path d="M 6,6 A 34,34 0 0 1 74,6" fill="none" stroke="' + color + '" stroke-width="6" stroke-linecap="round" opacity="0.3"/></svg>';
     },
     miniBarChart, miniDotChart, miniLineChart,
-    miniCountdownRing, featureCountdownRing, miniSleepBar, miniEnergyRing,
+    miniCountdownRing, miniSleepBar, miniEnergyRing,
     lineChart, scoreBar, progressBar,
   };
 })();
